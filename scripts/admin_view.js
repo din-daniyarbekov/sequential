@@ -92,14 +92,7 @@ function createProjectObject(name, display, tasks, users){
 
 project = createProjectObject("Cats", 0, tasks, [john, dave]);
 
-const app = new Vue({
-    el: '#app',
-    data: {
-        projects:[project]
-    }
-});
-
-Vue.component('task',{
+const taskComponent = Vue.component('task',{
     props: ['task'],
     template: `
         <div class="row">
@@ -124,9 +117,21 @@ Vue.component('task',{
                 </div>
             </div>
             <div class="col">
-                <img src="{{task.assignee.picture}}"/>
+                <img :src="task.assignee.picture"/>
             </div>
         </div>
     `
 });
+
+const app = new Vue({
+    el: '#app',
+    data: {
+        projects:[project]
+    },
+    components:{
+        task: taskComponent
+    }
+});
+
+
 

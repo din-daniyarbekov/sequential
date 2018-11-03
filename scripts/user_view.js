@@ -23,19 +23,7 @@ done_task = createTaskObject(1, "Get kitten", false, true, new Date());
 blocked_task = createTaskObject(2, "Pass CSC373", true, false, new Date());
 task = createTaskObject(3, "Go to cat cafe", false, false, new Date());
 
-const app = new Vue({
-    el: '#app',
-    data: {
-        tasks:[],
-        display:0,
-    },
-    computed{
-        completedTasks: tasks => tasks.filter(task => task['done']),
-        blockedTasks: tasks => tasks.filter(task => task['blocked'])
-    }
-});
-
-Vue.component('task',{
+const taskComponent = Vue.component('task',{
     props: ['task'],
     template: `
         <div class="row">
@@ -60,3 +48,19 @@ Vue.component('task',{
         </div>
     `
 });
+
+const app = new Vue({
+    el: '#app',
+    data: {
+        tasks:[],
+        display:0,
+    },
+    computed{
+        completedTasks: tasks => tasks.filter(task => task['done']),
+        blockedTasks: tasks => tasks.filter(task => task['blocked'])
+    },
+    components:{
+        task:taskComponent
+    }
+});
+
