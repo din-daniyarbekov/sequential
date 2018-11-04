@@ -2,3 +2,11 @@ img{
     height: 100px;
     width: 100px;
 }
+
+.set-width{
+    width: 100px;
+}
+
+.set-width-400{
+    width: 400px;
+}

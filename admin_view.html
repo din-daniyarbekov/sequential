@@ -10,36 +10,40 @@
 </head>
 <body>
     <div id="app">
-        <div v-for="project in projects" class="container">
-            <div class="row">
-                <button v-on:click="project.display = 1">
-                    Completed Tasks
-                </button>
-                <button v-on:click="project.display = 2">
-                    Blocked Tasks
-                </button>
-                <button v-on:click="project.display = 0">
-                    All Tasks
-                </button>
+        <h1 class="mx-auto set-width" >Projects</h1>
+        <div v-for="project in projects" class="container card">
+            <div class="card-body justify-content-center align-items-center">
+                <h2 class="card-title">{{project.name}}</h1>
+                <div class="btn-group" role="group" >
+                    <button v-on:click="project.display = 1" type="button" class="btn btn-secondary">
+                        Completed Tasks
+                    </button>
+                    <button v-on:click="project.display = 2" type="button" class="btn btn-secondary">
+                        Blocked Tasks
+                    </button>
+                    <button v-on:click="project.display = 0" role="button" class="btn btn-secondary">
+                        All Tasks
+                    </button>
+                </div>
+                <!--Display all tasks if project.display is 0-->
+                <ul v-show="project.display === 0" class="list-group mt-3 ">
+                    <li v-for="task in project.tasks" class="list-group-item">
+                        <task v-bind:task="task"></task>
+                    </li>
+                </ul>
+                <!--Display all completed tasks if project.display is 1-->
+                <ul v-show="project.display === 1" class="list-group mt-3 ">
+                    <li v-for="task in project.completedTasks" class="list-group-item">
+                       <task v-bind:task="task"></task>
+                    </li>
+                </ul>
+                <!--Display all blocked tasks if project.display is 2-->
+                <ul v-show="project.display === 2" class="list-group mt-3 ">
+                    <li v-for="task in project.blockedTasks" class="list-group-item">
+                        <task v-bind:task="task"></task>
+                    </li>
+                </ul>
             </div>
-            <!--Display all tasks if project.display is 0-->
-            <ul v-show="project.display === 0">
-                <li v-for="task in project.tasks">
-                    <task v-bind:task="task"></task>
-                </li>
-            </ul>
-            <!--Display all completed tasks if project.display is 1-->
-            <ul v-show="project.display === 1">
-                <li v-for="task in project.completedTasks">
-                   <task v-bind:task="task"></task>
-                </li>
-            </ul>
-            <!--Display all blocked tasks if project.display is 2-->
-            <ul v-show="project.display === 2">
-                <li v-for="task in project.blockedTasks">
-                    <task v-bind:task="task"></task>
-                </li>
-            </ul>
         </div>
     </div>
     <script src="https://unpkg.com/vue@2.5.17/dist/vue.js"></script>

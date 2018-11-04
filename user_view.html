@@ -2,37 +2,31 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <script src="https://unpkg.com/vue"></script>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="styles/admin_view.css" rel="stylesheet"/>
     <title>Sequential</title>
 </head>
 <body>
     <div id="app">
-        <div class="row">
-            <div class="col">
-                <button v-on:click="display = 1"> Completed Tasks </button>
-            </div>
-            <div class="col">
-                <button v-on:click="display = 2"> Blocked Tasks </button>
-            </div>
-            <div class="col">
-                <button v-on:click="display = 0"> All Tasks </button>
+        <h1 class="set-width mx-auto">Tasks</h1>
+        <div class="container mx-auto set-width-400 mt-2 mb-2">
+            <div class="btn-group">
+                <button type="button" class="btn btn-secondary" v-on:click="display = 1"> Completed Tasks </button>
+                <button type="button" class="btn btn-secondary" v-on:click="display = 2"> Blocked Tasks </button>
+                <button type="button" class="btn btn-secondary" v-on:click="display = 0"> All Tasks </button>
             </div>
         </div>
-        <ul v-show="display == 0">
-            <li v-for="task in tasks">
-                <task v-bind:task="task"></task>
-            </li>
-        </ul>
-        <ul v-show="display == 1">
-            <li v-for="task in completedTasks">
-                <task v-bind:task="task"></task>
-            </li>
-        </ul>
-        <ul v-show="display == 2">
-            <li v-for="task in blockedTasks">
-                <task v-bind:task="task"></task>
-            </li>
-        </ul>
+        <div v-show="display == 0">
+            <task v-for="task in tasks" v-bind:key="task.id" v-bind:task="task"></task>
+        </div>
+        <div v-show="display == 1">
+            <task v-for="task in completedTasks" v-bind:key="task.id" v-bind:task="task"></task>
+        </div>
+        <div v-show="display == 2">
+            <task v-for="task in blockedTasks" v-bind:key="task.id" v-bind:task="task"></task>
+        </div>
     </div>
     <script src="https://unpkg.com/vue"></script>
     <script src="scripts/user_view.js"></script>

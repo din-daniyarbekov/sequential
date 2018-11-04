@@ -97,27 +97,28 @@ const taskComponent = Vue.component('task',{
     template: `
         <div class="row">
             <div class="col-8">
-                <div class="row">
+                <div class="row h-75 ml-1">
                     {{task.text}}
                 </div>
-                <div class="row">
+                <div class="row align-items-end">
                     <div class="col">
-                        {{task.dueDate}}
+                        {{task.dueDate.toLocaleDateString()}}
                     </div>
                     <div class="col">
-                        <button class="blocker">
+                        <button class="blocker btn btn-danger btn-sm">
                             Blocker
                         </button>
                     </div>
                     <div class="col">
-                        <button class="done">
+                        <button class="done btn btn-success btn-sm">
                             Done
                         </button>
                     </div>
                 </div>
             </div>
-            <div class="col">
+            <div class="col text-center">
                 <img :src="task.assignee.picture"/>
+                <span>{{task.assignee.name}}</span>
             </div>
         </div>
     `
