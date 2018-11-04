@@ -4,7 +4,7 @@
  	<meta charset="utf-8">
     <title>Index</title>
     <link rel="stylesheet" type="text/css" href="styles/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="styles/login_page.css">
+    <link rel="stylesheet" type="text/css" href="styles/account_creation.css">
  </head>
  <body>
         <div class="container">
@@ -12,19 +12,30 @@
             <div class="col-sm-9 col-md-7 col-lg-5 mx-auto">
               <div class="card card-signin my-5">
                 <div class="card-body">
-                  <h5 class="card-title text-center"><b>Sign In</b></h5>
+                  <h5 class="card-title text-center"><b>Create Profile</b></h5>
                     <form class="form-signin">
                         <div class="form-group">
                           <label for="exampleInputEmail">Email address</label>
                           <input type="email" class="form-control" id="exampleInputEmail" aria-describedby="emailHelp" placeholder="Enter email">
-                          <small id="emailHelp" class="form-text text-muted">We won't share your email with anyone else</small>
                         </div>
                         <div class="form-group">
                           <label for="exampleInputPassword">Password</label>
                           <input type="password" class="form-control" id="exampleInputPassword" placeholder="Password">
                         </div>
-                     
+                        <div class="form-group">
+                          <label for="repeatPassword">Repeat a password</label>
+                          <input type="password" class="form-control" id="repeatPasswordPassword" placeholder="">
+                        </div>
+
+                        <p>Select your user category</p>
+                        <select class="user-selection">
+                            <option value="user">User</option>
+                            <option value="admin">Admin</option>
+                          </select>
+                        
                         <button type="submit" class="btn btn-lg btn-primary btn-block text-uppercase">Submit</button>
+
+                
                       </form>
 
 
@@ -34,6 +45,7 @@
             </div>
           </div>
         </div>
-        <script type="text/javascript" src="scripts/login.js"></script>
+        <script type="text/javascript" src="scripts/registration.js"></script>
+
  </body>
 </html>

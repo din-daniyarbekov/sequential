@@ -127,7 +127,8 @@ const taskComponent = Vue.component('task',{
 const app = new Vue({
     el: '#app',
     data: {
-        projects:[project]
+        projects:[project],
+        seen: false
     },
     components:{
         task: taskComponent
