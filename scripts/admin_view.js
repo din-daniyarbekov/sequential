@@ -86,7 +86,8 @@ function createProjectObject(name, display, tasks, users){
         completedTasks: completedTasks,
         tasks:tasks,
         blockedTasks:blockedTasks,
-        users:users
+        users:users,
+        seen:false
     }
 }
 
@@ -127,8 +128,7 @@ const taskComponent = Vue.component('task',{
 const app = new Vue({
     el: '#app',
     data: {
-        projects:[project],
-        seen: false
+        projects:[project]
     },
     components:{
         task: taskComponent
