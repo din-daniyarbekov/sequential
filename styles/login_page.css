@@ -45,4 +45,13 @@ body {
 .form-label-group input {
   border-radius: 2rem;
 }
+.registration{
+  margin:auto;
+  display:table;
+}
+.acc{
+  margin:auto;
+  padding-top: 20px; 
+  display:table;
+}
 
