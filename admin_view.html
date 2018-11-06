@@ -43,17 +43,28 @@
                         <task v-bind:task="task"></task>
                     </li>
                 </ul>
+                <!-- Invite a user to the project by typing his email address. Once user register, users info with the assigned project will be saved to the database.   -->
                 <button class="btn btn-primary mt-3" v-on:click="project.seen = !project.seen">Invite a user!</button>
-                <div v-show="project.seen">
+                <div v-show="project.seen" class="container">
                     <div class="row">
                         <div class="col-sm-9 col-md-7 col-lg-5">
-                                    <form class="form-signin">
-                                        <div class="form-group">
-                                            <label for="exampleInputEmail">Email address</label>
-                                            <input type="email" class="form-control" id="exampleInputEmail" aria-describedby="emailHelp" placeholder="Enter email">
-                                        </div>
-                                        <button type="submit" class="btn btn-primary btn-sm btn-block text-uppercase">Submit</button>
-                                    </form>
+                            <div class="card card-signin my-5">
+                            <div class="card-body">
+                              <h5 class="card-title text-center"><b>Invite a user</b></h5>
+                                <form class="form-signin">
+                                    <div class="form-group">
+                                      <label for="exampleInputEmail">Email address</label>
+                                      <input type="email" class="form-control" id="exampleInputEmail" aria-describedby="emailHelp" placeholder="Enter email">
+                                    </div>
+                                    <button type="submit" class="btn btn-primary btn-sm btn-block text-uppercase">Submit</button>
+            
+                            
+                                  </form>
+            
+            
+                              </form>
+                            </div>
+                          </div>
                                 </div>
                             </div>
                         </div>

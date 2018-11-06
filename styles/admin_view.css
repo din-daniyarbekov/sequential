@@ -2,7 +2,9 @@ img{
     height: 100px;
     width: 100px;
 }
-
+.container{
+    margin:0px;
+}
 .set-width{
     width: 100px;
 }
