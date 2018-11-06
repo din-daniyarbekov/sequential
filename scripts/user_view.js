@@ -8,7 +8,9 @@
  *  dueDate: DateTime,
  * }]
  */
-
+/*
+ * Code for creating default data. We would usually load this from server.
+ */
 function createTaskObject(id, text, blocked, done, dueDate){
     return {
         id: id,
@@ -22,7 +24,9 @@ function createTaskObject(id, text, blocked, done, dueDate){
 done_task = createTaskObject(1, "Get kitten", false, true, new Date());
 blocked_task = createTaskObject(2, "Pass CSC373", true, false, new Date());
 task = createTaskObject(3, "Go to cat cafe", false, false, new Date());
-
+/*
+ * End of server-side interaction code
+ */
 const taskComponent = Vue.component('task',{
     props: ['task'],
     template: `

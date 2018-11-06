@@ -76,6 +76,9 @@ done_task = createTaskObject(1, "Get kitten", false, true, new Date(), john);
 blocked_task = createTaskObject(2, "Pass CSC373", true, false, new Date(), dave);
 task = createTaskObject(3, "Go to cat cafe", false, false, new Date(), john);
 tasks = [done_task, blocked_task, task];
+/*
+End of where we would normally include server-side interaction
+ */
 
 function createProjectObject(name, display, tasks, users){
     completedTasks = tasks.filter(task => task['done'])
