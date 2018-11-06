@@ -17,6 +17,7 @@
 2. Account-creation.html - "Registration"<br />
 
     You're given the form, where you can fill out all the necessary information in order to get registered such as: email,password and the     preference for being admin or user<br />
+    
     Once registered, your information will be saved to the database<br />
 
 
