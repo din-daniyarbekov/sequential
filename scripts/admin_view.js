@@ -92,7 +92,8 @@ function createProjectObject(name, display, tasks, users){
         tasks:tasks,
         blockedTasks:blockedTasks,
         users:users,
-        seen:false
+        seen:false,
+        create:false
     }
 }
 
