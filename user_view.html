@@ -28,6 +28,22 @@
             <task v-for="task in blockedTasks" v-bind:key="task.id" v-bind:task="task"></task>
         </div>
     </div>
+     <div class="col-sm-9 col-md-7 col-lg-5">
+        <h5 class="card-title text-center"><b>Create a task</b></h5>
+                                <form class="form-signin">
+                                    <div class="form-group">
+                                        <input type="text" class="form-control" id="exampleTaskName" placeholder="Enter task name">
+
+
+                                        <input placeholder="Your Date" type="date" class="form-control" id="exampleDueDate" placeholder="Enter due date">
+                                    </div>
+                                        
+                                    <button type="submit" class="btn btn-lg btn-primary btn-block text-uppercase">Submit</button>
+
+                                        <!-- update the project data and  -->
+    
+                                </form>
+    </div>
     <script src="https://unpkg.com/vue"></script>
     <script src="scripts/user_view.js"></script>
 </body>
