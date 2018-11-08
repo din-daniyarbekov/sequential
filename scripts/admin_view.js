@@ -75,6 +75,8 @@ function createTaskObject(id, text, blocked, done, dueDate, assignee){
 done_task = createTaskObject(1, "Get kitten", false, true, new Date(), john);
 blocked_task = createTaskObject(2, "Pass CSC373", true, false, new Date(), dave);
 task = createTaskObject(3, "Go to cat cafe", false, false, new Date(), john);
+done_dog_task = createTaskObject(4, "Get puppy", false, true, new Date(), dave);
+dog_task = createTaskObject(5, "Go to dog cafe", false, false, new Date(), dave);
 tasks = [done_task, blocked_task, task];
 /*
 End of where we would normally include server-side interaction
@@ -95,6 +97,7 @@ function createProjectObject(name, display, tasks, users){
 }
 
 project = createProjectObject("Cats", 0, tasks, [john, dave]);
+second_project = createProjectObject("Dogs",0,[done_dog_task, dog_task],[john,dave]);
 
 const taskComponent = Vue.component('task',{
     props: ['task'],
@@ -131,7 +134,7 @@ const taskComponent = Vue.component('task',{
 const app = new Vue({
     el: '#app',
     data: {
-        projects:[project]
+        projects:[project,second_project]
     },
     components:{
         task: taskComponent
