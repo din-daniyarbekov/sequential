@@ -58,8 +58,8 @@ function createUserObject(id, name, picture){
     }
 }
 
-john = createUserObject(1,'John', 'images/default.png')
-dave = createUserObject(2,'Dave', 'images/default.png')
+const john = createUserObject(1,'John', 'images/default.png')
+const dave = createUserObject(2,'Dave', 'images/default.png')
 
 function createTaskObject(id, text, blocked, done, dueDate, assignee){
     return {
@@ -72,19 +72,19 @@ function createTaskObject(id, text, blocked, done, dueDate, assignee){
     }
 }
 
-done_task = createTaskObject(1, "Get kitten", false, true, new Date(), john);
-blocked_task = createTaskObject(2, "Pass CSC373", true, false, new Date(), dave);
-task = createTaskObject(3, "Go to cat cafe", false, false, new Date(), john);
-done_dog_task = createTaskObject(4, "Get puppy", false, true, new Date(), dave);
-dog_task = createTaskObject(5, "Go to dog cafe", false, false, new Date(), dave);
-tasks = [done_task, blocked_task, task];
+const done_task = createTaskObject(1, "Get kitten", false, true, new Date(), john);
+const blocked_task = createTaskObject(2, "Pass CSC373", true, false, new Date(), dave);
+const task = createTaskObject(3, "Go to cat cafe", false, false, new Date(), john);
+const done_dog_task = createTaskObject(4, "Get puppy", false, true, new Date(), dave);
+const dog_task = createTaskObject(5, "Go to dog cafe", false, false, new Date(), dave);
+const tasks = [done_task, blocked_task, task];
 /*
 End of where we would normally include server-side interaction
  */
 
 function createProjectObject(name, display, tasks, users){
-    completedTasks = tasks.filter(task => task['done'])
-    blockedTasks = tasks.filter(task => task['blocked'])
+    const completedTasks = tasks.filter(task => task['done'])
+    const blockedTasks = tasks.filter(task => task['blocked'])
     return {
         name: name,
         display: display,
@@ -96,8 +96,8 @@ function createProjectObject(name, display, tasks, users){
     }
 }
 
-project = createProjectObject("Cats", 0, tasks, [john, dave]);
-second_project = createProjectObject("Dogs",0,[done_dog_task, dog_task],[john,dave]);
+const project = createProjectObject("Cats", 0, tasks, [john, dave]);
+const second_project = createProjectObject("Dogs",0,[done_dog_task, dog_task],[john,dave]);
 
 const taskComponent = Vue.component('task',{
     props: ['task'],

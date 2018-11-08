@@ -21,9 +21,9 @@ function createTaskObject(id, text, blocked, done, dueDate){
     }
 }
 
-done_task = createTaskObject(1, "Get kitten", false, true, new Date());
-blocked_task = createTaskObject(2, "Pass CSC373", true, false, new Date());
-task = createTaskObject(3, "Go to cat cafe", false, false, new Date());
+const done_task = createTaskObject(1, "Get kitten", false, true, new Date());
+const blocked_task = createTaskObject(2, "Pass CSC373", true, false, new Date());
+const task = createTaskObject(3, "Go to cat cafe", false, false, new Date());
 /*
  * End of server-side interaction code
  */
