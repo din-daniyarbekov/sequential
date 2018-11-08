@@ -3,8 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <title>Sequential</title>
+    <link rel="stylesheet" type="text/css" href="styles/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="styles/account_creation.css">
 </head>
 <body>
 <!--Account Settings Here-->
+        <div class="container">
+          <div class="row">
+            <div class="col-sm-9 col-md-7 col-lg-5 mx-auto">
+              <div class="card card-signin my-5">
+                <div class="card-body">
+                  <h5 class="card-title text-center"><b>Modify Profile</b></h5>
+                    <form class="form-signin">
+                        <div class="form-group">
+                          <label for="exampleInputEmail"> Change email address</label>
+                          <input type="email" class="form-control" id="exampleInputEmail" aria-describedby="emailHelp" placeholder="Enter new email address">
+                        </div>
+                        <div class="form-group">
+                          <label for="exampleInputPassword">Change Password</label>
+                          <input type="password" class="form-control" id="exampleInputPassword" placeholder="Old Password">
+                        </div>
+                        <div class="form-group">
+                          <label for="repeatPassword">New password</label>
+                          <input type="password" class="form-control" id="repeatPasswordPassword" placeholder="Enter new password">
+                        </div>
+                        <div class="form-group">
+                
+                          <input type="password" class="form-control" id="repeatPasswordPassword" placeholder="Repeat new password">
+                        </div>
+                        <p>Change user permissions</p>
+                        <select class="user-selection">
+                            <option value="user">User</option>
+                            <option value="admin">Admin</option>
+                          </select>
+                        
+                        <button type="submit" class="btn btn-lg btn-primary btn-block text-uppercase">Apply changes</button>
+
+                
+                      </form>
+
+
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 </body>
 </html>
