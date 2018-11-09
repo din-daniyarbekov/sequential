@@ -10,7 +10,15 @@
 </head>
 <body>
     <div id="app">
+        
+
         <h1 class="set-width mx-auto">Tasks</h1>
+        <div class = "float-left btn-toolbar">
+
+            <a class="btn btn-primary" href="index.html">Logout</a>
+            <a class="btn btn-primary" href="account_settings.html">User Settings</a>
+
+        </div>
         <div class="container mx-auto set-width-400 mt-2 mb-2">
             <div class="btn-group">
                 <button type="button" class="btn btn-secondary" v-on:click="display = 1"> Completed Tasks </button>
@@ -28,7 +36,7 @@
             <task v-for="task in blockedTasks" v-bind:key="task.id" v-bind:task="task"></task>
         </div>
     </div>
-     <div class="col-sm-9 col-md-7 col-lg-5">
+     <div class="col-sm-3">
         <h5 class="card-title text-center"><b>Create a task</b></h5>
                                 <form class="form-signin">
                                     <div class="form-group">
@@ -37,10 +45,12 @@
 
                                         <input placeholder="Your Date" type="date" class="form-control" id="exampleDueDate" placeholder="Enter due date">
                                     </div>
-                                        
                                     <button type="submit" class="btn btn-lg btn-primary btn-block text-uppercase">Submit</button>
+                                
 
-                                        <!-- update the project data and  -->
+                                        <!-- create new task and update the project data on server  -->
+                                    
+               
     
                                 </form>
     </div>
