@@ -100,8 +100,24 @@ function createProjectObject(name, display, tasks, users){
 const project = createProjectObject("Cats", 0, tasks, [john, dave]);
 const second_project = createProjectObject("Dogs",0,[done_dog_task, dog_task],[john,dave]);
 
+
+
+/*when users press the "blocker" button, the data about this task being a blocker sent to the server and then the 
+admin who is overseeing the projects will be notified. Similar to done, after pressing done, the admin should be notified as well
+When the task deadline is expired, tasks that havent been done will change status to blocker and admins will be notified*/
+
+
+/*when users press the "Create New Project" the project information will popup and after filling it and hitting submit button
+the data will be sent to the server to add the empty project to the admins list*/
+
 const taskComponent = Vue.component('task',{
     props: ['task'],
+    data: function(){
+        return{
+            blockedStyle: false,
+            doneStyle:false
+        }
+    },
     template: `
         <div class="row">
             <div class="col-8">
@@ -113,12 +129,12 @@ const taskComponent = Vue.component('task',{
                         {{task.dueDate.toLocaleDateString()}}
                     </div>
                     <div class="col">
-                        <button class="blocker btn btn-danger btn-sm">
+                    <button v-on:click="blockerMethod" v-bind:class="{blocked: blockedStyle}" class="btn btn-outline-dark btn-sm">
                             Blocker
                         </button>
                     </div>
                     <div class="col">
-                        <button class="done btn btn-success btn-sm">
+                    <button v-on:click="doneMethod" v-bind:class="{done: doneStyle}" class="btn btn-outline-dark btn-sm">
                             Done
                         </button>
                     </div>
@@ -129,7 +145,22 @@ const taskComponent = Vue.component('task',{
                 <span>{{task.assignee.name}}</span>
             </div>
         </div>
-    `
+    `,
+    methods:{
+        blockerMethod: function(event){
+         this.$data.blockedStyle = !this.$data.blockedStyle
+         if(this.$data.doneStyle == true && this.$data.blockedStyle == true){
+             this.$data.blockedStyle = false;
+         }
+
+        },
+        doneMethod: function(event){
+            this.$data.doneStyle = !this.$data.doneStyle
+            if(this.$data.doneStyle == true && this.$data.blockedStyle == true){
+                this.$data.doneStyle = false;
+            }
+        }
+    }
 });
 
 const app = new Vue({
