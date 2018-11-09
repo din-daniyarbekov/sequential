@@ -1,6 +1,6 @@
 # team42
 
-
+Note: Account data is not being saved for this phase, therefore everytime you are at the login page you must create a profile.
 
 1. Index.html - "Sign-in"<br />
 
