@@ -25,3 +25,11 @@ img{
     border-style:thick;
     border-color:green;
 }
+
+.centered-text-align{
+    text-align: center;
+}
+
+.centered-auto-margin{
+    margin:0 auto;
+}

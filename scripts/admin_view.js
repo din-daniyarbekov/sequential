@@ -124,19 +124,19 @@ const taskComponent = Vue.component('task',{
                 <div class="row h-75 ml-1">
                     {{task.text}}
                 </div>
-                <div class="row align-items-end">
-                    <div class="col">
+                <div class="row mb-2">
+                    <div class="mr-2">
                         {{task.dueDate.toLocaleDateString()}}
                     </div>
-                    <div class="col">
-                    <button v-on:click="blockerMethod" v-bind:class="{blocked: blockedStyle}" class="btn btn-outline-dark btn-sm">
-                            Blocker
-                        </button>
-                    </div>
-                    <div class="col">
-                    <button v-on:click="doneMethod" v-bind:class="{done: doneStyle}" class="btn btn-outline-dark btn-sm">
-                            Done
-                        </button>
+                    <div >
+                        <div class="btn-group btn-group-sm" role="group" aria-label="Status Buttons" >
+                            <button v-on:click="blockerMethod" v-bind:class="{blocked: blockedStyle}" class="btn btn-outline-dark">
+                                Blocker
+                            </button>
+                            <button v-on:click="doneMethod" v-bind:class="{done: doneStyle}" class="btn btn-outline-dark">
+                                Done
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>

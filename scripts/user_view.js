@@ -30,7 +30,7 @@ const task = createTaskObject(3, "Go to cat cafe", false, false, new Date());
 const taskComponent = Vue.component('task',{
     props: ['task'],
     template: `
-        <div class="card container mb-2">
+        <div class="card container mb-2 w-50 ">
                 <div class="card-body">
                     <h5 class="card-title">{{task.text}}</h5>
                     <div class="row">
