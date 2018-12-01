@@ -11,13 +11,13 @@ function passwordCheck(e){
 
     if(email === "user@mail.com"){
         if(password == "12345"){
-            window.location = 'user_view.html';
+            window.location = '../static/user_view.html';
         } else{
             window.alert("Invalid Login Credentials");
         }
     } else if(email === "admin@mail.com"){
         if(password == "6789"){
-            window.location = 'admin_view.html';
+            window.location = '../static/admin_view.html';
 
         } else{
             window.alert("Invalid Login Credentials");
