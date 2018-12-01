@@ -6,6 +6,7 @@
  *  completedTasks:[{
  *      id: int,
  *      text: str,
+ *      priority: int,
  *      blocker: bool,
  *      done: bool,
  *      dueDate: DateTime,
@@ -18,6 +19,7 @@
  *  tasks:[{
  *      id: int,
  *      text: str,
+ *      priority: int,
  *      blocker: bool,
  *      done: bool,
  *      dueDate: DateTime,
@@ -100,7 +102,9 @@ function createProjectObject(name, display, tasks, users){
 const project = createProjectObject("Cats", 0, tasks, [john, dave]);
 const second_project = createProjectObject("Dogs",0,[done_dog_task, dog_task],[john,dave]);
 
-
+function makeTaskFilter(taskToFilterBy){
+    return (taskToFilter) => taskToFilter.id != taskToFilterBy.id;
+}
 
 /*when users press the "blocker" button, the data about this task being a blocker sent to the server and then the 
 admin who is overseeing the projects will be notified. Similar to done, after pressing done, the admin should be notified as well
@@ -109,56 +113,91 @@ When the task deadline is expired, tasks that havent been done will change statu
 
 /*when users press the "Create New Project" the project information will popup and after filling it and hitting submit button
 the data will be sent to the server to add the empty project to the admins list*/
-
 const taskComponent = Vue.component('task',{
-    props: ['task'],
+    props: ['task','project'],
     data: function(){
         return{
             blockedStyle: false,
             doneStyle:false
         }
     },
+    computed: {
+        listClassObject: function(){
+            return {
+                'border-secondary': !this.task.done && !this.task.blocked,
+                'border-success': this.task.done,
+                'border-danger': this.task.blocked
+            }
+        },
+        blockerButtonClassObject:function(){
+            return {
+                'blocked': this.task.blocked
+            }
+        },
+        doneButtonClassObject:function(){
+            return {
+                'done': this.task.done
+            }
+        }
+    },
     template: `
-        <div class="row">
-            <div class="col-8">
-                <div class="row h-75 ml-1">
-                    {{task.text}}
-                </div>
-                <div class="row mb-2">
-                    <div class="mr-2">
-                        {{task.dueDate.toLocaleDateString()}}
+        <li class="list-group-item mt-1 border" v-bind:class="listClassObject">
+            <div class="row">
+                <div class="col-8">
+                    <div class="row h-75 ml-1">
+                        {{task.text}}
                     </div>
-                    <div >
-                        <div class="btn-group btn-group-sm" role="group" aria-label="Status Buttons" >
-                            <button v-on:click="blockerMethod" v-bind:class="{blocked: blockedStyle}" class="btn btn-outline-dark">
-                                Blocker
-                            </button>
-                            <button v-on:click="doneMethod" v-bind:class="{done: doneStyle}" class="btn btn-outline-dark">
-                                Done
-                            </button>
+                    <div class="row mb-2">
+                        <div class="mr-2">
+                            {{task.dueDate.toLocaleDateString()}}
+                        </div>
+                        <div>
+                            <div class="btn-group btn-group-sm" role="group" aria-label="Status Buttons" >
+                                <button v-on:click="blockerMethod" class="btn btn-outline-dark" v-bind:class="blockerButtonClassObject">
+                                    Blocker
+                                </button>
+                                <button v-on:click="doneMethod" v-bind:class="doneButtonClassObject" class="btn btn-outline-dark">
+                                    Done
+                                </button>
+                                <button class="btn btn-outline-dark" v-on:click="deleteMethod">
+                                    Delete
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
+                <div class="col text-center">
+                    <img :src="task.assignee.picture"/>
+                    <span>{{task.assignee.name}}</span>
+                </div>
             </div>
-            <div class="col text-center">
-                <img :src="task.assignee.picture"/>
-                <span>{{task.assignee.name}}</span>
-            </div>
-        </div>
+        </li>
     `,
     methods:{
         blockerMethod: function(event){
-         this.$data.blockedStyle = !this.$data.blockedStyle
-         if(this.$data.doneStyle == true && this.$data.blockedStyle == true){
-             this.$data.blockedStyle = false;
-         }
-
+            this.task.blocked = !this.task.blocked;
+            if(this.task.blocked){
+                this.task.done = false;
+                this.project.completedTasks = this.project.completedTasks.filter(makeTaskFilter(this.task));
+                this.project.blockedTasks.push(this.task);
+            }else{
+                this.project.blockedTasks = this.project.blockedTasks.filter(makeTaskFilter(this.task));
+            }
         },
         doneMethod: function(event){
-            this.$data.doneStyle = !this.$data.doneStyle
-            if(this.$data.doneStyle == true && this.$data.blockedStyle == true){
-                this.$data.doneStyle = false;
+            this.task.done = !this.task.done;
+            if(this.task.done){
+                this.task.blocked =false;
+                this.project.blockedTasks = this.project.blockedTasks.filter(makeTaskFilter(this.task));
+                this.project.completedTasks.push(this.task);
+            }else{
+                this.project.completedTasks = this.project.completedTasks.filter(makeTaskFilter(this.task));
             }
+        },
+        deleteMethod: function(event){
+            this.project.tasks = this.project.tasks.filter(this.taskFilter);
+            this.project.blockedTasks = this.project.blockedTasks.filter(makeTaskFilter(this.task));
+            this.project.completedTasks = this.project.completedTasks.filter(makeTaskFilter(this.task));
         }
     }
 });

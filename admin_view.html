@@ -42,9 +42,7 @@
                 </div>
                 <!--Display all tasks if project.display is 0-->
                 <ul v-show="project.display === 0" class="list-group mt-3 ">
-                    <li v-for="task in project.tasks" class="list-group-item">
-                        <task v-bind:task="task"></task>
-                    </li>
+                    <task v-for="task in project.tasks" v-bind:task="task" v-bind:key="task.id" v-bind:project="project"></task>
                 </ul>
                 <!--Display all completed tasks if project.display is 1-->
                 <ul v-show="project.display === 1" class="list-group mt-3 ">
@@ -103,10 +101,7 @@
 
                                 
                                     <button type="submit" class="col-sm-9 col-md-7 col-lg-5">Apply changes</button>
-             
                                 </form>
-            
-                              
                             </div>
                             </div>
                         </div>

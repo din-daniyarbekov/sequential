@@ -5,6 +5,8 @@
  *  text: str,
  *  blocked: bool,
  *  done: bool,
+ *  priority:int,
+ *  description: str,
  *  dueDate: DateTime,
  * }]
  */
