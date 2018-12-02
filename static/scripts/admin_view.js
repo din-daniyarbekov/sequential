@@ -13,7 +13,6 @@
  *      assignee: {
  *          id: int,
  *          name: str,
- *          picture: str
  *      },
  *  }],
  *  tasks:[{
@@ -26,7 +25,6 @@
  *      assignee: {
  *          id: int,
  *          name: str,
- *          picture: str
  *      },
  *  }],
  *  blockedTasks:[{
@@ -38,13 +36,11 @@
  *      assignee: {
  *          id: int,
  *          name: str,
- *          picture: str
  *      },
  *  }],
  *  users:[{
  *      id: int,
  *      name: str,
- *      picture: str
  *  }]
  * }]
  */
@@ -52,16 +48,15 @@
 /*
  * What follows is code for creating the pre-loaded data, this is where we would usually load from the server
  */
-function createUserObject(id, name, picture){
+function createUserObject(id, name){
     return {
         id:id,
         name:name,
-        picture:picture
     }
 }
 
-const john = createUserObject(1,'John', 'images/default.png')
-const dave = createUserObject(2,'Dave', 'images/default.png')
+const john = createUserObject(1,'John')
+const dave = createUserObject(2,'Dave')
 
 function createTaskObject(id, text, blocked, done, dueDate, assignee){
     return {
@@ -144,10 +139,10 @@ const taskComponent = Vue.component('task',{
         <li class="list-group-item mt-1 border" v-bind:class="listClassObject">
             <div class="row">
                 <div class="col-8">
-                    <div class="row h-75 ml-1">
+                    <div class="row h-50 ml-1">
                         {{task.text}}
                     </div>
-                    <div class="row mb-2">
+                    <div class="row mt-2">
                         <div class="mr-2">
                             {{task.dueDate.toLocaleDateString()}}
                         </div>
@@ -167,7 +162,6 @@ const taskComponent = Vue.component('task',{
                     </div>
                 </div>
                 <div class="col text-center">
-                    <img :src="task.assignee.picture"/>
                     <span>{{task.assignee.name}}</span>
                 </div>
             </div>
