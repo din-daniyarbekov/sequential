@@ -58,10 +58,11 @@ function createUserObject(id, name){
 const john = createUserObject(1,'John')
 const dave = createUserObject(2,'Dave')
 
-function createTaskObject(id, text, blocked, done, dueDate, assignee){
+function createTaskObject(id, text, blocked, done, priority, dueDate, assignee){
     return {
         id: id,
         text: text,
+        priority: priority,
         blocked: blocked,
         done: done,
         dueDate: dueDate,
@@ -69,11 +70,11 @@ function createTaskObject(id, text, blocked, done, dueDate, assignee){
     }
 }
 
-const done_task = createTaskObject(1, "Get kitten", false, true, new Date(), john);
-const blocked_task = createTaskObject(2, "Pass CSC373", true, false, new Date(), dave);
-const task = createTaskObject(3, "Go to cat cafe", false, false, new Date(), john);
-const done_dog_task = createTaskObject(4, "Get puppy", false, true, new Date(), dave);
-const dog_task = createTaskObject(5, "Go to dog cafe", false, false, new Date(), dave);
+const done_task = createTaskObject(1, "Get kitten", false, true, 0, new Date(), john);
+const blocked_task = createTaskObject(2, "Pass CSC373", true, false, 1, new Date(), dave);
+const task = createTaskObject(3, "Go to cat cafe", false, false, 2, new Date(), john);
+const done_dog_task = createTaskObject(4, "Get puppy", false, true, 0, new Date(), dave);
+const dog_task = createTaskObject(5, "Go to dog cafe", false, false, 2, new Date(), dave);
 const tasks = [done_task, blocked_task, task];
 /*
 End of where we would normally include server-side interaction
@@ -163,6 +164,8 @@ const taskComponent = Vue.component('task',{
                 </div>
                 <div class="col text-center">
                     <span>{{task.assignee.name}}</span>
+                    <span v-show="task.priority == 1" class="badge badge-warning">IMPORTANT</span>
+                    <span v-show="task.priority == 2" class="badge badge-danger">URGENT</span>
                 </div>
             </div>
         </li>
