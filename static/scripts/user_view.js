@@ -6,71 +6,146 @@
  *  blocked: bool,
  *  done: bool,
  *  priority:int,
- *  description: str,
  *  dueDate: DateTime,
+ *  assignee: {
+ *      id: int,
+ *      name: str,
+ *  },
  * }]
  */
 /*
  * Code for creating default data. We would usually load this from server.
  */
-function createTaskObject(id, text, blocked, done, dueDate){
-    return {
-        id: id,
-        text: text,
-        blocked: blocked,
-        done: done,
-        dueDate: dueDate
-    }
+function createUserObject(id, name){
+	return {
+		id:id,
+		name:name,
+	}
 }
 
-const done_task = createTaskObject(1, "Get kitten", false, true, new Date());
-const blocked_task = createTaskObject(2, "Pass CSC373", true, false, new Date());
-const task = createTaskObject(3, "Go to cat cafe", false, false, new Date());
+const john = createUserObject(1,'John')
+
+
+function createTaskObject(id, text, blocked, done, priority, dueDate, assignee){
+	return {
+		id: id,
+		text: text,
+        priority:priority,
+		blocked: blocked,
+		done: done,
+		dueDate: dueDate,
+		assignee:assignee
+	}
+}
+
+const done_task = createTaskObject(1, "Get kitten", false, true, 0, new Date(), john);
+const blocked_task = createTaskObject(2, "Pass CSC373", true, false, 1, new Date(), john);
+const task = createTaskObject(3, "Go to cat cafe", false, false, 2, new Date(), john);
 /*
  * End of server-side interaction code
  */
 const taskComponent = Vue.component('task',{
-    props: ['task'],
-    template: `
-        <div class="card container mb-2 w-50 ">
-                <div class="card-body">
-                    <h5 class="card-title">{{task.text}}</h5>
-                    <div class="row">
-                        <div class="col">
-                            {{task.dueDate.toLocaleDateString()}}
-                        </div>
-                        <div class="col">
-                            <button class="blocker btn btn-danger btn-sm">
-                                Blocker
-                            </button>
-                        </div>
-                        <div class="col">
-                            <button class="done btn btn-success btn-sm">
-                                Done
-                            </button>
-                        </div>
-                    </div>
-                </div>
-        </div>
-    `
+	props: ['task'],
+	data: function(){
+		return{
+			blockedStyle: false,
+			doneStyle:false
+		}
+	},
+	computed: {
+		listClassObject: function(){
+			return {
+				'border-secondary': !this.task.done && !this.task.blocked,
+				'border-success': this.task.done,
+				'border-danger': this.task.blocked
+			}
+		},
+		blockerButtonClassObject:function(){
+			return {
+				'blocked': this.task.blocked
+			}
+		},
+		doneButtonClassObject:function(){
+			return {
+				'done': this.task.done
+			}
+		}
+	},
+	template: `
+		<div class="container card centered-auto-margin w-50 mt-1" v-bind:class="listClassObject">
+
+        			<div class="card-body">
+
+        				<div class="row h-50 ml-8">
+        					{{task.text}}
+                            <div class="col text-right">
+                                <span v-show="task.priority == 1" class="badge badge-warning">IMPORTANT</span>
+                                <span v-show="task.priority == 2" class="badge badge-danger">URGENT</span>
+                            </div>
+        				</div>
+
+        				<div class="row mt-2">
+        					<div class="mr-2">
+        						{{task.dueDate.toLocaleDateString()}}
+        					</div>
+        					<div class="btn-group btn-group-sm" role="group" aria-label="Status Buttons">
+
+        					   <button v-on:click="blockerMethod" class="btn btn-outline-dark" v-bind:class="blockerButtonClassObject">
+        								Blocker
+        						</button>
+        			 
+        						<button v-on:click="doneMethod" v-bind:class="doneButtonClassObject" class="btn btn-outline-dark">
+        							Done
+        						</button>
+        					</div>
+        				
+
+                         </div>
+        			</div>
+		</div>
+	`,
+	methods:{
+		blockerMethod: function(event){
+			this.task.blocked = !this.task.blocked;
+			if(this.task.blocked){
+				this.task.done = false;
+				/*this.project.completedTasks = this.project.completedTasks.filter(makeTaskFilter(this.task));
+				this.project.blockedTasks.push(this.task);
+				*/
+			}else{
+				/*this.project.blockedTasks = this.project.blockedTasks.filter(makeTaskFilter(this.task)); */
+			}
+		},
+		doneMethod: function(event){
+			this.task.done = !this.task.done;
+			if(this.task.done){
+				this.task.blocked =false;
+				/*this.project.blockedTasks = this.project.blockedTasks.filter(makeTaskFilter(this.task));
+				this.project.completedTasks.push(this.task);
+				*/
+			}else{
+				/*this.project.completedTasks = this.project.completedTasks.filter(makeTaskFilter(this.task));*/
+			}
+		}
+	}
 });
 
 const app = new Vue({
-    el: '#app',
-    data: {
-        tasks:[done_task, blocked_task, task],
-        display:0,
-    },
-    computed:{
-        completedTasks: function(){
-            return this.tasks.filter(task => task['done'])
-        },
-        blockedTasks: function() {
-            return this.tasks.filter(task => task['blocked'])
-        }
-    },
-    components:{
-        task:taskComponent
-    }
+	el: '#app',
+	data: {
+		tasks:[done_task, blocked_task, task],
+		display:0,
+	},
+	computed:{
+		completedTasks: function(){
+			return this.tasks.filter(task => task['done'])
+		},
+		blockedTasks: function() {
+			return this.tasks.filter(task => task['blocked'])
+		}
+	},
+	components:{
+		task:taskComponent
+	}
 });
 
