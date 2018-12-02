@@ -46,15 +46,11 @@
                 </ul>
                 <!--Display all completed tasks if project.display is 1-->
                 <ul v-show="project.display === 1" class="list-group mt-3 ">
-                    <li v-for="task in project.completedTasks" class="list-group-item">
-                       <task v-bind:task="task"></task>
-                    </li>
+                    <task v-for="task in project.completedTasks" v-bind:task="task" v-bind:key="task.id" v-bind:project="project"></task>
                 </ul>
                 <!--Display all blocked tasks if project.display is 2-->
                 <ul v-show="project.display === 2" class="list-group mt-3 ">
-                    <li v-for="task in project.blockedTasks" class="list-group-item">
-                        <task v-bind:task="task"></task>
-                    </li>
+                    <task v-for="task in project.blockedTasks" v-bind:task="task" v-bind:key="task.id" v-bind:project="project"></task>
                 </ul>
                 <!-- Invite a user to the project by typing his email address. Once user register, users info with the assigned project will be saved to the database.   -->
                 <button class="btn btn-primary mt-3" v-on:click="project.seen = !project.seen">Invite a user!</button>
