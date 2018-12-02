@@ -19,10 +19,10 @@ function registration(e){
     if(email != 'user@mail.com' && email != 'admin@mail.com' && password == repeatPassword){
         const userSelection = document.querySelector('.user-selection').value;
         if(userSelection == 'user'){
-            window.location = '../static/user_view.html';
+            window.location = '../user_view.html';
 
         } else {
-            window.location = '../static/admin_view.html';
+            window.location = '../admin_view.html';
 
         }
     }
