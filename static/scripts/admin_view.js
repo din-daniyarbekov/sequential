@@ -75,11 +75,27 @@ function createTaskObject(id, text, blocked, done, priority, dueDate, assignee){
     }
 }
 
-const done_task = createTaskObject(1, "Get kitten", false, true, 0, new Date(), john);
-const blocked_task = createTaskObject(2, "Pass CSC373", true, false, 1, new Date(), dave);
-const task = createTaskObject(3, "Go to cat cafe", false, false, 2, new Date(), john);
-const done_dog_task = createTaskObject(4, "Get puppy", false, true, 0, new Date(), dave);
-const dog_task = createTaskObject(5, "Go to dog cafe", false, false, 2, new Date(), dave);
+const date = new Date();
+date.setHours(0);
+date.setMinutes(0);
+date.setSeconds(0);
+date.setMilliseconds(0);
+let addDays = (oldDate,days) => {
+    const oldTime = oldDate.getTime();
+    const newDate = new Date(oldDate.setTime(oldTime + days * 86400000));
+    oldDate.setTime(oldTime);
+    return newDate;
+};
+const today = new Date(date);
+const yesterday = addDays(date, -1);
+const withinNextWeek = addDays(date, 4);
+const withinNextMonth = addDays(date, 10);
+const withinNextYear = addDays(date, 35);
+const done_task = createTaskObject(1, "Get kitten", false, true, 0, date, john);
+const blocked_task = createTaskObject(2, "Pass CSC373", true, false, 1, yesterday, dave);
+const task = createTaskObject(3, "Go to cat cafe", false, false, 2, withinNextWeek, john);
+const done_dog_task = createTaskObject(4, "Get puppy", false, true, 0, withinNextMonth, dave);
+const dog_task = createTaskObject(5, "Go to dog cafe", false, false, 2, withinNextYear, dave);
 const tasks = [done_task, blocked_task, task];
 /*
 End of where we would normally include server-side interaction
@@ -139,6 +155,23 @@ const taskComponent = Vue.component('task',{
             return {
                 'done': this.task.done
             }
+        },
+        relativeTime:function(){
+            const today = new Date(date);
+            const tomorrow = addDays(date, 1);
+            const nextWeek = addDays(date, 7);
+            const nextMonth = addDays(date, 30);
+            if(this.task.dueDate < today){
+                return 0;
+            }else if(this.task.dueDate < tomorrow){
+                return 1;
+            }else if(this.task.dueDate < nextWeek){
+                return 2;
+            }else if(this.task.dueDate < nextMonth){
+                return 3;
+            }else{
+                return 4;
+            }
         }
     },
     template: `
@@ -171,6 +204,11 @@ const taskComponent = Vue.component('task',{
                     <span>{{task.assignee.name}}</span>
                     <span v-show="task.priority == 1" class="badge badge-warning">IMPORTANT</span>
                     <span v-show="task.priority == 2" class="badge badge-danger">URGENT</span>
+                    <span v-show="relativeTime == 0" class="badge badge-danger">OVERDUE</span>
+                    <span v-show="relativeTime == 1" class="badge badge-warning">TODAY</span>
+                    <span v-show="relativeTime == 2" class="badge badge-primary">NEXT 7 DAYS</span>
+                    <span v-show="relativeTime == 3" class="badge badge-info">NEXT 30 DAYS</span>
+                    <span v-show="relativeTime == 4" class="badge badge-secondary">FUTURE</span>
                 </div>
             </div>
         </li>
@@ -252,9 +290,9 @@ const app = new Vue({
             }
         },
         createTask: function(project){
-            today = new Date();
+            date = new Date();
             inputDueDate = new Date(this.newDueDate);
-            if(today <= inputDueDate){
+            if(date <= inputDueDate){
                 alert(`New Task Made With:(Name:${this.newTaskText},Due Date:${this.newDueDate.toString()},Assignee:${this.newTaskUserEmail}),Priority:${this.newTaskPriority}`);
                 const newId = incrementMaxId(project.tasks);
                 const foundUser = project.users.find(foundUserFunction(this.newTaskUserEmail));
