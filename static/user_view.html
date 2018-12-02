@@ -9,16 +9,23 @@
     <title>Sequential</title>
 </head>
 <body>
-    <div id="app">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="index.html">Logout</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="account_settings.html">User Settings</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+   <div id="app">
         
 
         <h1 class="set-width mx-auto">Tasks</h1>
-        <div class = "float-left btn-toolbar">
 
-            <a class="btn btn-primary" href="index.html">Logout</a>
-            <a class="btn btn-primary" href="account_settings.html">User Settings</a>
-
-        </div>
         <div class="container mx-auto set-width-400 mt-2 mb-2">
             <div class="btn-group">
                 <button type="button" class="btn btn-secondary" v-on:click="display = 1"> Completed Tasks </button>
@@ -35,24 +42,29 @@
         <div v-show="display == 2">
             <task v-for="task in blockedTasks" v-bind:key="task.id" v-bind:task="task"></task>
         </div>
-    </div>
-     <div class="col-sm-3">
-        <h5 class="card-title text-center"><b>Create a task</b></h5>
-                                <form class="form-signin">
-                                    <div class="form-group">
-                                        <input type="text" class="form-control" id="exampleTaskName" placeholder="Enter task name">
+     
+
+                <div class="w-50 centered-auto-margin">
+                    <div class="card card-signin my-5">
+                    <div class="card-body">
+                      <h5 class="card-title text-center"><b>Create New Task</b></h5>
+                        <form class="form-signin">
+                            <div class="form-group">
+                                <input type="text" class="form-control" id="exampleTaskName" placeholder="Enter task name">
 
 
-                                        <input placeholder="Your Date" type="date" class="form-control" id="exampleDueDate" placeholder="Enter due date">
-                                    </div>
-                                    <button type="submit" class="btn btn-lg btn-primary btn-block text-uppercase">Submit</button>
+                                <input placeholder="Your Date" type="date" class="form-control" id="exampleDueDate">
+                            </div>
                                 
-
-                                        <!-- create new task. update the project data on server and the admin's list -->
-                                    
-               
-    
-                                </form>
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-primary" v-on:click="task.create = !task.create">Create Task</button>
+                            </div>
+                        </form>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     <script src="https://unpkg.com/vue"></script>
     <script src="scripts/user_view.js"></script>
