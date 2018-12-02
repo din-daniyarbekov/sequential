@@ -26,6 +26,7 @@
             <h1 class="centered-text-align">Projects</h1>
             <a class="mt-1 btn btn-primary" href="project_creation.html">Create New Project</a>
         </div>
+        <input class="mt-1 form-control centered-auto-margin w-50" type="text" id="search" v-model="search" placeholder="Search your tasks here!"/>
         <div v-for="project in projects" class="mt-3 container card centered-auto-margin w-50" v-bind:project="project" v-bind:key="project.name">
             <div class="card-body justify-content-center align-items-center">
                 <h2 class="card-title">{{project.name}}</h2>
@@ -42,15 +43,15 @@
                 </div>
                 <!--Display all tasks if project.display is 0-->
                 <ul v-show="project.display === 0" class="list-group mt-3 ">
-                    <task v-for="task in sortTaskList(project.tasks)" v-bind:task="task" v-bind:key="task.id" v-bind:project="project"></task>
+                    <task v-for="task in searchAndSortTaskList(project.tasks)" v-bind:task="task" v-bind:key="task.id" v-bind:project="project"></task>
                 </ul>
                 <!--Display all completed tasks if project.display is 1-->
                 <ul v-show="project.display === 1" class="list-group mt-3 ">
-                    <task v-for="task in sortTaskList(project.completedTasks)" v-bind:task="task" v-bind:key="task.id" v-bind:project="project"></task>
+                    <task v-for="task in searchAndSortTaskList(project.completedTasks)" v-bind:task="task" v-bind:key="task.id" v-bind:project="project"></task>
                 </ul>
                 <!--Display all blocked tasks if project.display is 2-->
                 <ul v-show="project.display === 2" class="list-group mt-3 ">
-                    <task v-for="task in sortTaskList(project.blockedTasks)" v-bind:task="task" v-bind:key="task.id" v-bind:project="project"></task>
+                    <task v-for="task in searchAndSortTaskList(project.blockedTasks)" v-bind:task="task" v-bind:key="task.id" v-bind:project="project"></task>
                 </ul>
                 <!-- Invite a user to the project by typing his email address. Once user register, users info with the assigned project will be saved to the database.   -->
                 <button class="btn btn-primary mt-3" data-toggle="modal" :data-target="`#inviteUserModal${project.name}`">Invite a user!</button>

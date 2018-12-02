@@ -270,7 +270,8 @@ const app = new Vue({
         newTaskUserEmail:"",
         newTaskPriority:0,
         newDueDate:new Date(),
-        inviteUserName:""
+        inviteUserName:"",
+        search:""
     },
     components:{
         task: taskComponent
@@ -302,7 +303,12 @@ const app = new Vue({
                 alert('Invalid due date');
             }
         },
-        sortTaskList: function(taskList){
+        searchAndSortTaskList: function(taskList){
+            search_func = function(search_str){
+                return function(task){
+                    return task.text.includes(search_str);
+                }
+            }
             sort_func = function(first_task,second_task){
                 if(first_task.dueDate < second_task.dueDate){
                     return -1;
@@ -315,7 +321,11 @@ const app = new Vue({
                 }
                 return 0;
             }
-            return taskList.slice(0).sort(sort_func);         
+            if(this.search === ""){
+                return taskList.slice(0).sort(sort_func);
+            }else{
+                return taskList.filter(search_func(this.search)).sort(sort_func);
+            }         
         }
     }
 });
