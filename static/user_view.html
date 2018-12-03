@@ -50,26 +50,26 @@
                             <h5 class="modal-title" id="createTaskModalLabel">Create Task</h5>
                         </div>
                         <div class="modal-body">
-                                <div class="form-group">
-                                    <label for="newTaskText">Task Text</label>
-                                    <input v-model="newTaskText" type="text" class="form-control" id="newTaskText" placeholder="Enter task text">
-                                    <label for="newDueDate">Due Date</label>
-                                    <input v-model="newTaskDueDate" placeholder="Your Date" type="date" class="form-control" id="newDueDate" placeholder="Enter due date">
-                                    <label for="selectPriority">Task Priority</label>
-                                    <select id="selectPriority" class="user-selection form-control" v-model="newTaskPriority">
-                                        <option value=0>Normal</option>
-                                        <option value=1>Important</option>
-                                        <option value=2>Urgent</option>
-                                    </select>
-                                 
-                        </div>
+                            <div class="form-group">
+                                <label for="newTaskText">Task Text</label>
+                                <input v-model="newTaskText" type="text" class="form-control" id="newTaskText" placeholder="Enter task text">
+                                <label for="newDueDate">Due Date</label>
+                                <input v-model="newTaskDueDate" placeholder="Your Date" type="date" class="form-control" id="newDueDate" placeholder="Enter due date">
+                                <label for="selectPriority">Task Priority</label>
+                                <select id="selectPriority" class="user-selection form-control" v-model="newTaskPriority">
+                                    <option value=0>Normal</option>
+                                    <option value=1>Important</option>
+                                    <option value=2>Urgent</option>
+                                </select>
+                             
+                            </div>
                         <div class="modal-footer">
                             <button id="createTaskButton" type="submit" class="btn btn-primary btn-sm" v-on:click="createTask()" data-dismiss="modal">Create Task</button>
                         </div>
+                        </div>
                     </div>
-                </div>
     
-        </div>
+                </div>
         </div>
     </div>
     <script src="https://unpkg.com/vue"></script>

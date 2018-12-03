@@ -206,7 +206,7 @@ const taskComponent = Vue.component('task',{
             }
         },
         deleteMethod: function(event){
-            this.project.tasks = this.project.tasks.filter(this.taskFilter);
+            this.project.tasks = this.project.tasks.filter(makeTaskFilter(this.task));
             this.project.blockedTasks = this.project.blockedTasks.filter(makeTaskFilter(this.task));
             this.project.completedTasks = this.project.completedTasks.filter(makeTaskFilter(this.task));
         }
@@ -235,7 +235,8 @@ const app = new Vue({
         newTaskPriority:0,
         newDueDate:new Date(),
         inviteUserName:"",
-        search:""
+        search:"",
+        newProjectText:"",
     },
     components:{
         task: taskComponent
@@ -244,7 +245,10 @@ const app = new Vue({
         inviteUser:function(project){
             const foundUser = project.users.find(foundUserFunction(this.inviteUserEmail));
             if(validateEmail(this.inviteUserEmail) && foundUser === undefined){
-                const newUserId = incrementMaxId(project.users);
+                let newUserId = 1;
+                if(project.users.length > 0){
+                    newUserId = incrementMaxId(project.users);
+                }
                 const newUser = createUserObject(newUserId, this.inviteUserName, this.inviteUserEmail);
                 project.users.push(newUser);
                 alert(`Email provided:${this.inviteUserEmail}`);
@@ -258,15 +262,38 @@ const app = new Vue({
             date = new Date();
             inputDueDate = new Date(this.newDueDate);
             if(date <= inputDueDate){
-                alert(`New Task Made With:(Name:${this.newTaskText},Due Date:${this.newDueDate.toString()},Assignee:${this.newTaskUserEmail}),Priority:${this.newTaskPriority}`);
-                const newId = incrementMaxId(project.tasks);
-                const foundUser = project.users.find(foundUserFunction(this.newTaskUserEmail));
-                const task = createTaskObject(newId,this.newTaskText,false, false, this.newTaskPriority, inputDueDate, foundUser);
-                project.tasks.push(task);
-            }else{
-                alert('Invalid due date');
+                if(this.newTaskText){
+
+                    alert(`New Task Made With:(Name:${this.newTaskText},Due Date:${this.newDueDate.toString()},Assignee:${this.newTaskUserEmail}),Priority:${this.newTaskPriority}`);
+                    let newId = 1;
+                    if(project.tasks.length > 0){
+                        newId = incrementMaxId(project.tasks);
+                    }
+                    const foundUser = project.users.find(foundUserFunction(this.newTaskUserEmail));
+                    const task = createTaskObject(newId,this.newTaskText,false, false, this.newTaskPriority, inputDueDate, foundUser);
+                    project.tasks.push(task);
+                } else {
+                    alert('Task name cannot be null')
+                }
+
+            } else{
+                alert('Assigned due date cannot have already passed');
             }
         },
+
+
+        createProject:function(){
+            
+            if (this.newProjectText){
+
+                alert(`New Project called: ${this.newProjectText} created`); 
+                const newProject = createProjectObject(this.newProjectText, 0, [], []);
+                this.projects.push(newProject);
+            }else{
+                alert('Project name cannot be null')
+            }
+        },
+
         searchAndSortTaskList: function(taskList){
             const search_func = function(search_str){
                 return function(task){
