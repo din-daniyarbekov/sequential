@@ -10,6 +10,13 @@ const sort_task_func = function(first_task,second_task){
     }
     return 0;
 }
+const incrementMaxId = function(elementList){
+    const ids = elementList.map((element) => element.id);
+    const maxId = ids.reduce((acc,id) => {
+        return Math.max(acc, id);
+    });
+    return maxId + 1;
+}
 
 const working_date = new Date();
 working_date.setHours(0);

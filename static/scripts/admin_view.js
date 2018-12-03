@@ -233,13 +233,6 @@ const validateEmail = (email) => {
     return expression.test(String(email).toLowerCase())
 }
 
-const incrementMaxId = function(elementList){
-    const ids = elementList.map((element) => element.id);
-    const maxId = ids.reduce((acc,id) => {
-        return Math.max(acc, id);
-    });
-    return maxId + 1;
-}
 
 const foundUserFunction = function(emailToFind){
     return function(user){

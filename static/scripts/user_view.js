@@ -7,10 +7,6 @@
  *  done: bool,
  *  priority:int,
  *  dueDate: DateTime,
- *  assignee: {
- *      id: int,
- *      name: str,
- *  },
  * }]
  */
 /*
@@ -26,21 +22,21 @@ function createUserObject(id, name){
 const john = createUserObject(1,'John')
 
 
-function createTaskObject(id, text, blocked, done, priority, dueDate, assignee){
+function createTaskObject(id, text, blocked, done, priority, dueDate){
 	return {
 		id: id,
 		text: text,
         priority:priority,
 		blocked: blocked,
 		done: done,
-		dueDate: dueDate,
-		assignee:assignee
-	}
+		dueDate: dueDate	}
 }
 
 const done_task = createTaskObject(1, "Get kitten", false, true, 0, yesterday, john);
 const blocked_task = createTaskObject(2, "Pass CSC373", true, false, 1, today, john);
 const task = createTaskObject(3, "Go to cat cafe", false, false, 2, withinNextWeek, john);
+const tasks = [done_task, blocked_task, task];
+
 /*
  * End of server-side interaction code
  */
@@ -156,6 +152,9 @@ const app = new Vue({
 	data: {
 		tasks:[done_task, blocked_task, task],
 		display:0,
+		newTaskPriority:0,
+		newTaskText:"",
+		newTaskDueDate:new Date(),
 		search:""
 	},
 	computed:{
@@ -171,6 +170,22 @@ const app = new Vue({
 	},
 	components:{
 		task:taskComponent
-	}
+	},
+ 	methods:{
+ 		createTask: function(){
+			date = new Date();
+	        inputDueDate = new Date(this.newTaskDueDate);
+	        if(date <= inputDueDate){
+	            alert(`New Task Made With:(Name:${this.newTaskText},Due Date:${this.newTaskDueDate.toString()},Priority:${this.newTaskPriority}`);
+	            const newId = incrementMaxId(this.tasks);
+	            const task = createTaskObject(newId,this.newTaskText,false, false, this.newTaskPriority, inputDueDate);
+	            this.tasks.push(task);
+	        }else{
+	            alert('Invalid due date');
+	        }
+
+ 		}
+ 	}
+
 });
 
