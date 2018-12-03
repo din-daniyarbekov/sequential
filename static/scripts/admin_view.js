@@ -142,21 +142,7 @@ const taskComponent = Vue.component('task',{
             }
         },
         relativeTime:function(){
-            const today = new Date(working_date);
-            const tomorrow = addDays(working_date, 1);
-            const nextWeek = addDays(working_date, 7);
-            const nextMonth = addDays(working_date, 30);
-            if(this.task.dueDate < today){
-                return 0;
-            }else if(this.task.dueDate < tomorrow){
-                return 1;
-            }else if(this.task.dueDate < nextWeek){
-                return 2;
-            }else if(this.task.dueDate < nextMonth){
-                return 3;
-            }else{
-                return 4;
-            }
+            return relativeTimeOfTask(this.task);
         }
     },
     template: `

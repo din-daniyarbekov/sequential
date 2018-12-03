@@ -65,6 +65,9 @@ const taskComponent = Vue.component('task',{
 			return {
 				'done': this.task.done
 			}
+		},
+		relativeTime: function(){
+			return relativeTimeOfTask(this.task);
 		}
 	},
 	template: `
@@ -76,7 +79,12 @@ const taskComponent = Vue.component('task',{
         					{{task.text}}
                             <div class="col text-right">
                                 <span v-show="task.priority == 1" class="badge badge-warning">IMPORTANT</span>
-                                <span v-show="task.priority == 2" class="badge badge-danger">URGENT</span>
+								<span v-show="task.priority == 2" class="badge badge-danger">URGENT</span>
+								<span v-show="relativeTime == 0" class="badge badge-danger">OVERDUE</span>
+								<span v-show="relativeTime == 1" class="badge badge-warning">TODAY</span>
+								<span v-show="relativeTime == 2" class="badge badge-primary">NEXT 7 DAYS</span>
+								<span v-show="relativeTime == 3" class="badge badge-info">NEXT 30 DAYS</span>
+								<span v-show="relativeTime == 4" class="badge badge-secondary">FUTURE</span>
                             </div>
         				</div>
 
