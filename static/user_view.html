@@ -9,16 +9,20 @@
     <title>Sequential</title>
 </head>
 <body>
-    <div id="app">
-        
-
-        <h1 class="set-width mx-auto">Tasks</h1>
-        <div class = "float-left btn-toolbar">
-
-            <a class="btn btn-primary" href="index.html">Logout</a>
-            <a class="btn btn-primary" href="account_settings.html">User Settings</a>
-
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="index.html">Logout</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="account_settings.html">User Settings</a>
+                </li>
+            </ul>
         </div>
+    </nav>
+   <div id="app">
+        <h1 class="set-width mx-auto">Tasks</h1>
         <div class="container mx-auto set-width-400 mt-2 mb-2">
             <div class="btn-group">
                 <button type="button" class="btn btn-secondary" v-on:click="display = 1"> Completed Tasks </button>
@@ -26,8 +30,9 @@
                 <button type="button" class="btn btn-secondary" v-on:click="display = 0"> All Tasks </button>
             </div>
         </div>
+        <input class="mt-1 form-control centered-auto-margin w-50" type="text" id="search" v-model="search" placeholder="Search your tasks here!"/> 
         <div v-show="display == 0">
-            <task v-for="task in tasks" v-bind:key="task.id" v-bind:task="task"></task>
+            <task v-for="task in searchedTasks" v-bind:key="task.id" v-bind:task="task"></task>
         </div>
         <div v-show="display == 1">
             <task v-for="task in completedTasks" v-bind:key="task.id" v-bind:task="task"></task>
@@ -35,26 +40,43 @@
         <div v-show="display == 2">
             <task v-for="task in blockedTasks" v-bind:key="task.id" v-bind:task="task"></task>
         </div>
-    </div>
-     <div class="col-sm-3">
-        <h5 class="card-title text-center"><b>Create a task</b></h5>
-                                <form class="form-signin">
-                                    <div class="form-group">
-                                        <input type="text" class="form-control" id="exampleTaskName" placeholder="Enter task name">
-
-
-                                        <input placeholder="Your Date" type="date" class="form-control" id="exampleDueDate" placeholder="Enter due date">
-                                    </div>
-                                    <button type="submit" class="btn btn-lg btn-primary btn-block text-uppercase">Submit</button>
-                                
-
-                                        <!-- create new task. update the project data on server and the admin's list -->
-                                    
-               
+        <div class="centered-text-align">
+            <button class="btn btn-primary mt-3" data-toggle="modal" data-target="#createTaskModal">Create a task</button>
+        </div>
+        <div class="modal fade" id="createTaskModal" tabindex="-1" role="dialog" aria-labelledby="createTaskModal" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="createTaskModalLabel">Create Task</h5>
+                        </div>
+                        <div class="modal-body">
+                                <div class="form-group">
+                                    <label for="newTaskText">Task Text</label>
+                                    <input v-model="newTaskText" type="text" class="form-control" id="newTaskText" placeholder="Enter task text">
+                                    <label for="newDueDate">Due Date</label>
+                                    <input v-model="newTaskDueDate" placeholder="Your Date" type="date" class="form-control" id="newDueDate" placeholder="Enter due date">
+                                    <label for="selectPriority">Task Priority</label>
+                                    <select id="selectPriority" class="user-selection form-control" v-model="newTaskPriority">
+                                        <option value=0>Normal</option>
+                                        <option value=1>Important</option>
+                                        <option value=2>Urgent</option>
+                                    </select>
+                                 
+                        </div>
+                        <div class="modal-footer">
+                            <button id="createTaskButton" type="submit" class="btn btn-primary btn-sm" v-on:click="createTask()" data-dismiss="modal">Create Task</button>
+                        </div>
+                    </div>
+                </div>
     
-                                </form>
+        </div>
+        </div>
     </div>
     <script src="https://unpkg.com/vue"></script>
+    <script src="scripts/util.js"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
     <script src="scripts/user_view.js"></script>
 </body>
 </html>

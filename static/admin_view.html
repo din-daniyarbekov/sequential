@@ -26,7 +26,8 @@
             <h1 class="centered-text-align">Projects</h1>
             <a class="mt-1 btn btn-primary" href="project_creation.html">Create New Project</a>
         </div>
-        <div v-for="project in projects" class="mt-3 container card centered-auto-margin w-50">
+        <input class="mt-1 form-control centered-auto-margin w-50" type="text" id="search" v-model="search" placeholder="Search your tasks here!"/>
+        <div v-for="project in projects" class="mt-3 container card centered-auto-margin w-50" v-bind:project="project" v-bind:key="project.name">
             <div class="card-body justify-content-center align-items-center">
                 <h2 class="card-title">{{project.name}}</h2>
                 <div class="btn-group" role="group" >
@@ -42,63 +43,65 @@
                 </div>
                 <!--Display all tasks if project.display is 0-->
                 <ul v-show="project.display === 0" class="list-group mt-3 ">
-                    <task v-for="task in project.tasks" v-bind:task="task" v-bind:key="task.id" v-bind:project="project"></task>
+                    <task v-for="task in searchAndSortTaskList(project.tasks)" v-bind:task="task" v-bind:key="task.id" v-bind:project="project"></task>
                 </ul>
                 <!--Display all completed tasks if project.display is 1-->
                 <ul v-show="project.display === 1" class="list-group mt-3 ">
-                    <task v-for="task in project.completedTasks" v-bind:task="task" v-bind:key="task.id" v-bind:project="project"></task>
+                    <task v-for="task in searchAndSortTaskList(project.completedTasks)" v-bind:task="task" v-bind:key="task.id" v-bind:project="project"></task>
                 </ul>
                 <!--Display all blocked tasks if project.display is 2-->
                 <ul v-show="project.display === 2" class="list-group mt-3 ">
-                    <task v-for="task in project.blockedTasks" v-bind:task="task" v-bind:key="task.id" v-bind:project="project"></task>
+                    <task v-for="task in searchAndSortTaskList(project.blockedTasks)" v-bind:task="task" v-bind:key="task.id" v-bind:project="project"></task>
                 </ul>
                 <!-- Invite a user to the project by typing his email address. Once user register, users info with the assigned project will be saved to the database.   -->
-                <button class="btn btn-primary mt-3" v-on:click="project.seen = !project.seen">Invite a user!</button>
-                <div v-show="project.seen" class="container">
-                    <div class="row">
-                        <div class="col-sm-9 col-md-7 col-lg-5">
-                            <div class="card card-signin my-5">
-                                <div class="card-body">
-                                    <h5 class="card-title text-center"><b>Invite a user</b></h5>
-                                    <form class="form-signin">
-                                        <div class="form-group">
-                                            <label for="exampleInputEmail">Email address</label>
-                                            <input type="email" class="form-control" id="exampleInputEmail" aria-describedby="emailHelp" placeholder="Enter email">
-                                        </div>
-                                        <button type="submit" class="btn btn-primary btn-sm btn-block text-uppercase">Submit</button>
-                                    </form>
-                                </div>
+                <button class="btn btn-primary mt-3" data-toggle="modal" :data-target="`#inviteUserModal${project.name}`">Invite a user!</button>
+                <div class="modal fade" :id="`inviteUserModal${project.name}`" tabindex="-1" role="dialog" :aria-labelledby="`inviteUserModal`" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="inviteUserModalLabel">Invite User</h5> 
+                            </div>
+                            <div class="modal-body">
+                                    <div class="form-group">
+                                        <label for="inviteUserName">User Name</label>
+                                        <input v-model="inviteUserName" type="text" class="form-control" id="inviteUserName" placeholder="Enter name"/>
+                                        <label for="inputEmail">Email Address</label>
+                                        <input v-model="inviteUserEmail" type="email" class="form-control" id="inputEmail" aria-describedby="emailHelp" placeholder="Enter email">
+                                    </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button  id="inviteUserButton" type="submit" class="btn btn-primary btn-sm btn-block text-uppercase" v-on:click="inviteUser(project)" data-dismiss="modal">Submit</button>
                             </div>
                         </div>
                     </div>
                 </div>
-                <button class="btn btn-primary mt-3" v-on:click="project.create = !project.create">Create a task</button>
-                <div class="container">
-                    <div class="row">
-                        <div class="col-sm-9 col-md-7 col-lg-5">
-                            <div class="card card-signin my-5">
-                            <div class="card-body">
-                              <h5 class="card-title text-center"><b>Create a task</b></h5>
-                                <form class="form-signin">
-                                    <div class="form-group">
-                                        <input type="text" class="form-control" id="exampleTaskName" placeholder="Enter task name">
-
-
-                                        <input placeholder="Your Date" type="date" class="form-control" id="exampleDueDate" placeholder="Enter due date">
-                                    </div>
-                                        
-                                     <label for="selectUser">Assign user to task</label>
-                                        <select id ="selectUser" class="user-selection">
-                                            <option value="user">User</option>
-                                            <option value="admin">Admin</option>
-                                        </select>
-
-                                        <!-- create a new task and update the project data on server-->
-
-                                
-                                    <button type="submit" class="col-sm-9 col-md-7 col-lg-5">Apply changes</button>
-                                </form>
+               <button class="btn btn-primary mt-3" data-toggle="modal" :data-target="`#createTaskModal${project.name}`">Create a task</button>
+                <div class="modal fade" :id="`createTaskModal${project.name}`" tabindex="-1" role="dialog" :aria-labelledby="`createTaskModal${project.name}`" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="createTaskModalLabel">Create Task</h5>
                             </div>
+                            <div class="modal-body">
+                                    <div class="form-group">
+                                        <label for="newTaskText">Task Text</label>
+                                        <input v-model="newTaskText" type="text" class="form-control" id="newTaskText" placeholder="Enter task text">
+                                        <label for="newDueDate">Due Date</label>
+                                        <input v-model="newDueDate" placeholder="Your Date" type="date" class="form-control" id="newDueDate" placeholder="Enter due date">
+                                        <label for="selectPriority">Task Priority</label>
+                                        <select id="selectPriority" class="user-selection form-control" v-model="newTaskPriority">
+                                            <option value=0>Normal</option>
+                                            <option value=1>Important</option>
+                                            <option value=2>Urgent</option>
+                                        </select>
+                                        <label for="selectUser">Assign user to task</label>
+                                        <select id="selectUser" class="user-selection form-control" v-model="newTaskUserEmail">
+                                            <option v-for="user in project.users" v-bind:value="user.email">{{user.name}}</option>
+                                        </select>
+                                    </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button id="createTaskButton" type="submit" class="btn btn-primary btn-sm" v-on:click="createTask(project)" data-dismiss="modal">Create Task</button>
                             </div>
                         </div>
                     </div>
@@ -106,8 +109,11 @@
             </div>
         </div>
     </div>
-    </div>
     <script src="https://unpkg.com/vue@2.5.17/dist/vue.js"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+    <script src="scripts/util.js"></script>
     <script src="scripts/admin_view.js"></script>
 </body>
 </html>
