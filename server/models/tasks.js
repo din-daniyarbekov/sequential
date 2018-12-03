@@ -7,7 +7,7 @@ let tasks = mongoose.model('Tasks',{
     description: {
         type: String,
         maxlength: 300,
-        minlength: 10
+        minlength: 5
     },
     blocker: {
         type: Boolean,
@@ -26,6 +26,10 @@ let tasks = mongoose.model('Tasks',{
         default: 0
     },
     _creator: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true
+    },
+    project: {
         type: mongoose.Schema.Types.ObjectId,
         required: true
     }

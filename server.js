@@ -4,7 +4,7 @@ const bodyParser = require('body-parser');
 const {Mongoose} = require('./server/db/mongoose');
 const {User} = require('./server/models/users')
 const {tasks} = require('./server/models/tasks')
-const {Projects} = require('./server/models/projects')
+const {projects} = require('./server/models/projects')
 const session = require('express-session')
 
 const _ = require('lodash');
@@ -37,44 +37,9 @@ app.use(session({
 	}
 }))
 
-const sessionChecker = (req, res, next) => {
-	if (req.session.user) {
-        if(req.session.user.userType == 'admin'){
-            res.redirect('admin_view');
-        }
-        else{
-            res.redirect('user_view');
-        }
-	} else {
-		next();
-	}
-}
 
-app.get('/',sessionChecker,(req,res)=>{
+app.get('/',(req,res)=>{
     res.redirect('./login');
-})
-
-
-app.get('/admin_view', (req, res) => {
-	// check if we have active session cookie
-    
-    //need to render the view using vue ssr
-    // if (req.session.user) {
-	// 	//res.sendFile(__dirname + '/public/dashboard.html')
-		
-	// } else {
-		res.redirect('/login')
-})
-
-app.get('/user_view', (req, res) => {
-	// check if we have active session cookie
-    
-    //need to render the view using vue ssr
-    // if (req.session.user) {
-	// 	//res.sendFile(__dirname + '/public/dashboard.html')
-		
-	// } else {
-		res.redirect('/login')
 })
 
 
@@ -96,10 +61,7 @@ app.post('/users/login', (req, res) => {
     })
 
 
-
-
-
-var authenticate = (req, res, next) => {
+let authenticate = (req, res, next) => {
         var token = req.header('x-auth');
       
         User.findByToken(token).then((user) => {
@@ -130,7 +92,7 @@ app.delete('/users/logout',authenticate,(req,res)=>{
 
 
 app.post('/users/registration',(req,res)=>{
-    let body = _.pick(req.body, ['name','email','password']);
+    let body = _.pick(req.body, ['name','email','password','userType']);
     let user = new User(body);
 
     user.save().then(() => {
@@ -146,77 +108,104 @@ app.post('/users/registration',(req,res)=>{
 
 
 
-app.post('/add_task',authenticate, (req,res)=>{
-  let task  = new tasks({
-      description: req.body.description,
-      id: req.body.id,
-      blocker: req.body.blocker,
-      dueDate: req.body.date,
-      _creator: req.user.id
-  });
+// app.post('/add_task',authenticate, (req,res)=>{
+//   let task  = new tasks({
+//       description: req.body.description,
+//       id: req.body.id,
+//       blocker: req.body.blocker,
+//       dueDate: req.body.date,
+//       _creator: req.user.id
+//   });
 
-  task.save().then((docs)=>{
-    res.send(docs)
-  }, (e) =>{
-    res.send(e);
-  });
-});
+//   task.save().then((docs)=>{
+//     res.send(docs)
+//   }, (e) =>{
+//     res.send(e);
+//   });
+// });
 
-app.patch('/block_task/:id', (req,res)=>{
-    let ID = req.params.id;
-    let body = _.pick(req.body,['blocker']);
-
-    let bodyBlocker = (body.blocker == 'true');
-
-    tasks.findOneAndUpdate({id: ID}, {$set:{blocker: bodyBlocker}}).then((doc)=>{
-        res.send(doc);
-    }).catch((e) =>{
-        res.status(400).send(e)
+app.post('/add_project',authenticate, (req,res)=>{
+    let project  = new projects({
+        name: req.body.name,
+        _admin: req.user.id
     });
-    
-});
-
-app.patch('/done_task/:id', (req,res)=>{
-    let ID = req.params.id;
-    let body = _.pick(req.body,['done']);
-
-    let bodyDone = (body.done == 'true');
-
-    tasks.findOneAndUpdate({id: ID}, {$set:{done: bodyDone}}).then((doc)=>{
-        res.send(doc);
-    }).catch((e) =>{
-        res.status(400).send(e)
+  
+    project.save().then((docs)=>{
+      res.send(docs)
+    }, (e) =>{
+      res.send(e);
     });
+  });
+  
+// app.patch('/block_task/:id',authenticate, (req,res)=>{
+//     let ID = req.params.id;
+//     let body = _.pick(req.body,['blocker']);
+
+//     let bodyBlocker = (body.blocker == 'true');
+
+//     tasks.findOneAndUpdate({id: ID,
+//     _creator: req.user.id}, {$set:{blocker: bodyBlocker}}).then((doc)=>{
+//         res.send(doc);
+//     }).catch((e) =>{
+//         res.status(400).send(e)
+//     });
     
-});
+// });
+
+// app.patch('/done_task/:id',authenticate, (req,res)=>{
+//     let ID = req.params.id;
+//     let body = _.pick(req.body,['done']);
+
+//     let bodyDone = (body.done == 'true');
+
+//     tasks.findOneAndUpdate({id: ID,
+//         _creator: req.user.id}, {$set:{done: bodyDone}}).then((doc)=>{
+//         res.send(doc);
+//     }).catch((e) =>{
+//         res.status(400).send(e)
+//     });
+    
+// });
 
 
-app.delete('/delete_task/:id',(req,res)=>{
-    let ID = req.params.id;
+// app.delete('/delete_task/:id',authenticate,(req,res)=>{
+//     let ID = req.params.id;
 
-    tasks.find({id: ID}).then((docs)=>{
-        if(!docs){
-            return res.status(404).send();
-        }
+//     tasks.findOne({
+//         id: ID,
+//         _creator: req.user.id
+//     }).then((docs)=>{
+//         if(!docs){
+//             return res.status(404).send();
+//         }
         
-        if(docs.length > 0){
-            docs.forEach(doc => doc.remove());
-        }
-        return res.status(200).send();
-    })
-})
+//         if(docs.length > 0){
+//             docs.forEach(doc => doc.remove());
+//         }
+//         return res.status(200).send();
+//     })
+// })
 
 
-app.get('/get_tasks',authenticate,(req,res)=>{
-    tasks.find({
-        _creator: req.user.id
+// app.get('/get_tasks',authenticate,(req,res)=>{
+//     tasks.find({
+//         _creator: req.user.id
+//     }).then((docs) =>{
+//         res.send({docs})
+//     },(e)=>{
+//         res.status(400).send(e);
+//     })
+// })
+
+app.get('/get_projects',authenticate,(req,res)=>{
+    projects.find({
+        _admin: req.user.id
     }).then((docs) =>{
         res.send({docs})
     },(e)=>{
         res.status(400).send(e);
     })
 })
-
 
 
 app.listen(3000, ()=>{
