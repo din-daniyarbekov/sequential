@@ -27,3 +27,21 @@ const yesterday = addDays(working_date, -1);
 const withinNextWeek = addDays(working_date, 4);
 const withinNextMonth = addDays(working_date, 10);
 const withinNextYear = addDays(working_date, 35);
+
+const relativeTimeOfTask = function(task){
+    const today = new Date(working_date);
+    const tomorrow = addDays(working_date, 1);
+    const nextWeek = addDays(working_date, 7);
+    const nextMonth = addDays(working_date, 30);
+    if(task.dueDate < today){
+        return 0;
+    }else if(task.dueDate < tomorrow){
+        return 1;
+    }else if(task.dueDate < nextWeek){
+        return 2;
+    }else if(task.dueDate < nextMonth){
+        return 3;
+    }else{
+        return 4;
+    }
+}
