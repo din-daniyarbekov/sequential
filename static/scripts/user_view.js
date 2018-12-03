@@ -76,7 +76,9 @@ const taskComponent = Vue.component('task',{
         			<div class="card-body">
 
         				<div class="row h-50 ml-8">
+        					
         					{{task.text}}
+     
                             <div class="col text-right">
                                 <span v-show="task.priority == 1" class="badge badge-warning">IMPORTANT</span>
 								<span v-show="task.priority == 2" class="badge badge-danger">URGENT</span>
@@ -162,7 +164,7 @@ const app = new Vue({
 		display:0,
 		newTaskPriority:0,
 		newTaskText:"",
-		newTaskDueDate:new Date(),
+		newDueDate:new Date(),
 		search:""
 	},
 	computed:{
@@ -181,13 +183,18 @@ const app = new Vue({
 	},
  	methods:{
  		createTask: function(){
-			date = new Date();
-	        inputDueDate = new Date(this.newTaskDueDate);
-	        if(date <= inputDueDate){
+
+            // assume tasks are due at 11:59 pm on their due date
+
+            current = new Date();
+            dueDate = new Date(this.newDueDate);
+            dueDate.setDate(dueDate.getDate()+1);
+
+	        if(current <= dueDate){
 	        	if(this.newTaskText){
-		            alert(`New Task Made With:(Name:${this.newTaskText},Due Date:${this.newTaskDueDate.toString()},Priority:${this.newTaskPriority}`);
+		            alert(`New Task Made With:(Name:${this.newTaskText},Due Date:${this.newDueDate.toString()},Priority:${this.newTaskPriority}`);
 		            const newId = incrementMaxId(this.tasks);
-		            const task = createTaskObject(newId,this.newTaskText,false, false, this.newTaskPriority, inputDueDate);
+		            const task = createTaskObject(newId,this.newTaskText,false, false, this.newTaskPriority, dueDate);
 		            this.tasks.push(task);
 		        }else{
 		        	alert('Task name cannot be null');

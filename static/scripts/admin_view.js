@@ -157,7 +157,7 @@ const taskComponent = Vue.component('task',{
                             {{task.dueDate.toLocaleDateString()}}
                         </div>
                         <div>
-                            <div class="btn-group btn-group-sm" role="group" aria-label="Status Buttons" >
+                            <div class="btn-group btn-group-sm mb-2" role="group" aria-label="Status Buttons" >
                                 <button v-on:click="blockerMethod" class="btn btn-outline-dark" v-bind:class="blockerButtonClassObject">
                                     Blocker
                                 </button>
@@ -172,14 +172,14 @@ const taskComponent = Vue.component('task',{
                     </div>
                 </div>
                 <div class="col text-center">
-                    <span>{{task.assignee.name}}</span>
+                    <div> <span>{{task.assignee.name}}</span></div>
                     <span v-show="task.priority == 1" class="badge badge-warning">IMPORTANT</span>
                     <span v-show="task.priority == 2" class="badge badge-danger">URGENT</span>
                     <span v-show="relativeTime == 0" class="badge badge-danger">OVERDUE</span>
                     <span v-show="relativeTime == 1" class="badge badge-warning">TODAY</span>
-                    <span v-show="relativeTime == 2" class="badge badge-primary">NEXT 7 DAYS</span>
-                    <span v-show="relativeTime == 3" class="badge badge-info">NEXT 30 DAYS</span>
-                    <span v-show="relativeTime == 4" class="badge badge-secondary">FUTURE</span>
+                    <span v-show="relativeTime == 2" class="badge badge-primary">WITHIN 7 DAYS</span>
+                    <span v-show="relativeTime == 3" class="badge badge-info">WITHIN 30 DAYS</span>
+                    <span v-show="relativeTime == 4" class="badge badge-secondary">MORE THAN 30 DAYS</span>
                 </div>
             </div>
         </li>
@@ -242,50 +242,61 @@ const app = new Vue({
         task: taskComponent
     },
     methods:{
+
         inviteUser:function(project){
             const foundUser = project.users.find(foundUserFunction(this.inviteUserEmail));
-            if(validateEmail(this.inviteUserEmail) && foundUser === undefined){
-                let newUserId = 1;
-                if(project.users.length > 0){
-                    newUserId = incrementMaxId(project.users);
-                }
-                const newUser = createUserObject(newUserId, this.inviteUserName, this.inviteUserEmail);
-                project.users.push(newUser);
-                alert(`Email provided:${this.inviteUserEmail}`);
-            }else if(!validateEmail(this.inviteUserEmail)){
-                alert('Email is invalid');
-            }else{
-                alert('Duplicate user found');
-            }
-        },
-        createTask: function(project){
-            date = new Date();
-            inputDueDate = new Date(this.newDueDate);
-            if(date <= inputDueDate){
-                if(this.newTaskText){
-
-                    alert(`New Task Made With:(Name:${this.newTaskText},Due Date:${this.newDueDate.toString()},Assignee:${this.newTaskUserEmail}),Priority:${this.newTaskPriority}`);
-                    let newId = 1;
-                    if(project.tasks.length > 0){
-                        newId = incrementMaxId(project.tasks);
+            if(this.inviteUserName){
+                if(validateEmail(this.inviteUserEmail) && foundUser === undefined){
+                    let newUserId = 1;
+                    if(project.users.length > 0){
+                        newUserId = incrementMaxId(project.users);
                     }
-                    const foundUser = project.users.find(foundUserFunction(this.newTaskUserEmail));
-                    const task = createTaskObject(newId,this.newTaskText,false, false, this.newTaskPriority, inputDueDate, foundUser);
-                    project.tasks.push(task);
-                } else {
-                    alert('Task name cannot be null')
+                    const newUser = createUserObject(newUserId, this.inviteUserName, this.inviteUserEmail);
+                    project.users.push(newUser);
+                    alert(`Email provided:${this.inviteUserEmail}`);
+                }else if(!validateEmail(this.inviteUserEmail)){
+                    alert('Email is invalid');
+                }else{
+                    alert('Duplicate user found');
+                }        
+            } else {
+                alert('The user name cannot be null');
                 }
+        },
 
-            } else{
+        createTask: function(project){
+
+            // assume tasks are due at 11:59 pm on their due date
+
+            current = new Date()
+            dueDate = new Date(this.newDueDate);
+            dueDate.setDate(dueDate.getDate()+1);
+
+            if(current <= dueDate){
+                if(this.newTaskText){
+                    if(this.newTaskUserEmail){
+                        alert(`New Task Made With:(Name:${this.newTaskText},Due Date:${this.newDueDate.toString()},Assignee:${this.newTaskUserEmail}),Priority:${this.newTaskPriority}`);
+                        let newId = 1;
+                        if(project.tasks.length > 0){
+                            newId = incrementMaxId(project.tasks);
+                        }   
+                        const foundUser = project.users.find(foundUserFunction(this.newTaskUserEmail));
+                        const task = createTaskObject(newId,this.newTaskText,false, false, this.newTaskPriority, dueDate, foundUser);
+                        project.tasks.push(task); 
+                    }else{
+                        alert('A person must be assigned to a new task!');
+                    }
+                }else{
+                    alert('Task name cannot be null');
+                }
+            }else{
                 alert('Assigned due date cannot have already passed');
             }
         },
 
-
         createProject:function(){
             
             if (this.newProjectText){
-
                 alert(`New Project called: ${this.newProjectText} created`); 
                 const newProject = createProjectObject(this.newProjectText, 0, [], []);
                 this.projects.push(newProject);
