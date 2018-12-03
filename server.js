@@ -2,9 +2,8 @@ const express = require('express');
 const bodyParser = require('body-parser');
 
 const {Mongoose} = require('./server/db/mongoose');
-const {User} = require('./server/models/users')
-const {tasks} = require('./server/models/tasks')
-const {projects} = require('./server/models/projects')
+const {User} = require('./server/models/users');
+const {Projects} = require('./server/models/projects');
 const session = require('express-session')
 
 const _ = require('lodash');
@@ -77,9 +76,6 @@ let authenticate = (req, res, next) => {
         });
       };
 
-app.get('/users/me', authenticate, (req, res) => {
-    res.send(req.user);
-  });
 
 
 app.delete('/users/logout',authenticate,(req,res)=>{
@@ -92,7 +88,7 @@ app.delete('/users/logout',authenticate,(req,res)=>{
 
 
 app.post('/users/registration',(req,res)=>{
-    let body = _.pick(req.body, ['name','email','password','userType']);
+    let body = _.pick(req.body, ['name','email','password','isAdmin']);
     let user = new User(body);
 
     user.save().then(() => {
@@ -125,15 +121,16 @@ app.post('/users/registration',(req,res)=>{
 // });
 
 app.post('/add_project',authenticate, (req,res)=>{
-    let project  = new projects({
+    let project  = new Projects({
         name: req.body.name,
-        _admin: req.user.id
+        admin: req.user.id
     });
   
     project.save().then((docs)=>{
       res.send(docs)
     }, (e) =>{
-      res.send(e);
+        console.log(e);
+        res.status(400).sendFile(__dirname + "/static/error.html");
     });
   });
   
@@ -198,15 +195,83 @@ app.post('/add_project',authenticate, (req,res)=>{
 // })
 
 app.get('/get_projects',authenticate,(req,res)=>{
-    projects.find({
-        _admin: req.user.id
+    Projects.find({
+        admin: req.user.id
     }).then((docs) =>{
         res.send({docs})
     },(e)=>{
         res.status(400).send(e);
+    });
+});
+
+app.post('/create_task/admin',authenticate, (req, res) =>{
+    Projects.findOne({
+        admin: req.user.id,
+        name: req.body.projectName
+    }).then((project) => {
+        User.findOne({
+            email: req.body.assigneeEmail
+        }).then((user) => {
+            task = {
+                id: parseInt(req.body.taskId),
+                text: req.body.text,
+                dueDate: new Date(req.body.dueDate),
+                priority: parseInt(req.body.priority),
+                assignee: user._id
+            }
+            project.tasks.push(task);
+            project.save().then((docs) => {
+                res.send({docs});
+            }, (e) => {
+                res.status(400).send(e);
+            })
+        }, (e) => {
+            console.log(e);
+            res.status(400).send(e);
+        })
+    }, (e) => {
+        console.log(e);
+        res.status(400).send(e);
+    });
+});
+
+app.get('/get_tasks', authenticate, (req, res) => {
+    Projects.findOne({
+        'tasks.assignee': req.user.id
+    }).then((doc) => {
+        res.send({doc});
+    }, (e) => {
+        res.status(400).sendFile(__dirname + "static/error.html");
+    });
+});
+
+app.post('/create_task', authenticate, (req, res) => {
+   Projects.findOneAndUpdate({
+       'task.assignee': req.user.id
+   },
+   {
+       '$push': {
+           'tasks':{
+               'id':req.body.taskId,
+               'text':req.body.taskText,
+               'dueDate':req.body.taskDueDate,
+               'priority':req.body.taskPriority,
+               'assignee':req.body
+           }
+       }
+   }).then((doc) => {
+       res.send('Success');
+   }, (e) => {
+       console.log(e);
+       res.status(400).sendFile(__dirname + "static/error.html");
+   }) 
+});
+
+app.patch('/update_task', authenticate, (req, res) => {
+    Projects.findOneAndUpdate({
+        'task.assignee': req.user.id
     })
 })
-
 
 app.listen(3000, ()=>{
     console.log('started on port 3000')
