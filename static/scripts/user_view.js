@@ -38,9 +38,9 @@ function createTaskObject(id, text, blocked, done, priority, dueDate, assignee){
 	}
 }
 
-const done_task = createTaskObject(1, "Get kitten", false, true, 0, new Date(), john);
-const blocked_task = createTaskObject(2, "Pass CSC373", true, false, 1, new Date(), john);
-const task = createTaskObject(3, "Go to cat cafe", false, false, 2, new Date(), john);
+const done_task = createTaskObject(1, "Get kitten", false, true, 0, yesterday, john);
+const blocked_task = createTaskObject(2, "Pass CSC373", true, false, 1, today, john);
+const task = createTaskObject(3, "Go to cat cafe", false, false, 2, withinNextWeek, john);
 /*
  * End of server-side interaction code
  */
@@ -130,18 +130,43 @@ const taskComponent = Vue.component('task',{
 	}
 });
 
+function constructFilterFunc(search, propertyFilter){
+	//0 implies get all tasks, 1 gets done tasks, 2 gets blocked tasks
+	function filterByProperty(task){
+		if(propertyFilter == 0){
+			return true;
+		}else if(propertyFilter == 1){
+			return task['done'];
+		}else{
+			return task['blocked'];
+		}
+	}
+	if(search === ""){
+		return filterByProperty;
+	}else{
+		return function(task){
+			const lowerCaseTaskText = task.text.toLowerCase();
+			return filterByProperty(task) && lowerCaseTaskText.includes(search.toLowerCase());
+		}
+	}
+}
+
 const app = new Vue({
 	el: '#app',
 	data: {
 		tasks:[done_task, blocked_task, task],
 		display:0,
+		search:""
 	},
 	computed:{
+		searchedTasks:function(){
+			return this.tasks.filter(constructFilterFunc(this.search, 0)).sort(sort_task_func);
+		},
 		completedTasks: function(){
-			return this.tasks.filter(task => task['done'])
+			return this.tasks.filter(constructFilterFunc(this.search, 1)).sort(sort_task_func);
 		},
 		blockedTasks: function() {
-			return this.tasks.filter(task => task['blocked'])
+			return this.tasks.filter(constructFilterFunc(this.search, 2)).sort(sort_task_func);
 		}
 	},
 	components:{

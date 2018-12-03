@@ -22,10 +22,7 @@
         </div>
     </nav>
    <div id="app">
-        
-
         <h1 class="set-width mx-auto">Tasks</h1>
-
         <div class="container mx-auto set-width-400 mt-2 mb-2">
             <div class="btn-group">
                 <button type="button" class="btn btn-secondary" v-on:click="display = 1"> Completed Tasks </button>
@@ -33,8 +30,9 @@
                 <button type="button" class="btn btn-secondary" v-on:click="display = 0"> All Tasks </button>
             </div>
         </div>
+        <input class="mt-1 form-control centered-auto-margin w-50" type="text" id="search" v-model="search" placeholder="Search your tasks here!"/> 
         <div v-show="display == 0">
-            <task v-for="task in tasks" v-bind:key="task.id" v-bind:task="task"></task>
+            <task v-for="task in searchedTasks" v-bind:key="task.id" v-bind:task="task"></task>
         </div>
         <div v-show="display == 1">
             <task v-for="task in completedTasks" v-bind:key="task.id" v-bind:task="task"></task>
@@ -67,6 +65,7 @@
         </div>
     </div>
     <script src="https://unpkg.com/vue"></script>
+    <script src="scripts/util.js"></script>
     <script src="scripts/user_view.js"></script>
 </body>
 </html>
