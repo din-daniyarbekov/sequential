@@ -2,9 +2,8 @@ const express = require('express');
 const bodyParser = require('body-parser');
 
 const {Mongoose} = require('./server/db/mongoose');
-const {User} = require('./server/models/users')
-const {tasks} = require('./server/models/tasks')
-const {Projects} = require('./server/models/projects')
+const {User} = require('./server/models/users');
+const {Projects} = require('./server/models/projects');
 const session = require('express-session')
 
 const _ = require('lodash');
@@ -37,44 +36,9 @@ app.use(session({
 	}
 }))
 
-const sessionChecker = (req, res, next) => {
-	if (req.session.user) {
-        if(req.session.user.userType == 'admin'){
-            res.redirect('admin_view');
-        }
-        else{
-            res.redirect('user_view');
-        }
-	} else {
-		next();
-	}
-}
 
-app.get('/',sessionChecker,(req,res)=>{
+app.get('/',(req,res)=>{
     res.redirect('./login');
-})
-
-
-app.get('/admin_view', (req, res) => {
-	// check if we have active session cookie
-    
-    //need to render the view using vue ssr
-    // if (req.session.user) {
-	// 	//res.sendFile(__dirname + '/public/dashboard.html')
-		
-	// } else {
-		res.redirect('/login')
-})
-
-app.get('/user_view', (req, res) => {
-	// check if we have active session cookie
-    
-    //need to render the view using vue ssr
-    // if (req.session.user) {
-	// 	//res.sendFile(__dirname + '/public/dashboard.html')
-		
-	// } else {
-		res.redirect('/login')
 })
 
 
@@ -96,10 +60,7 @@ app.post('/users/login', (req, res) => {
     })
 
 
-
-
-
-var authenticate = (req, res, next) => {
+let authenticate = (req, res, next) => {
         var token = req.header('x-auth');
       
         User.findByToken(token).then((user) => {
@@ -115,9 +76,6 @@ var authenticate = (req, res, next) => {
         });
       };
 
-app.get('/users/me', authenticate, (req, res) => {
-    res.send(req.user);
-  });
 
 
 app.delete('/users/logout',authenticate,(req,res)=>{
@@ -130,7 +88,7 @@ app.delete('/users/logout',authenticate,(req,res)=>{
 
 
 app.post('/users/registration',(req,res)=>{
-    let body = _.pick(req.body, ['name','email','password']);
+    let body = _.pick(req.body, ['name','email','password','isAdmin']);
     let user = new User(body);
 
     user.save().then(() => {
@@ -146,78 +104,174 @@ app.post('/users/registration',(req,res)=>{
 
 
 
-app.post('/add_task',authenticate, (req,res)=>{
-  let task  = new tasks({
-      description: req.body.description,
-      id: req.body.id,
-      blocker: req.body.blocker,
-      dueDate: req.body.date,
-      _creator: req.user.id
-  });
+// app.post('/add_task',authenticate, (req,res)=>{
+//   let task  = new tasks({
+//       description: req.body.description,
+//       id: req.body.id,
+//       blocker: req.body.blocker,
+//       dueDate: req.body.date,
+//       _creator: req.user.id
+//   });
 
-  task.save().then((docs)=>{
-    res.send(docs)
-  }, (e) =>{
-    res.send(e);
-  });
-});
+//   task.save().then((docs)=>{
+//     res.send(docs)
+//   }, (e) =>{
+//     res.send(e);
+//   });
+// });
 
-app.patch('/block_task/:id', (req,res)=>{
-    let ID = req.params.id;
-    let body = _.pick(req.body,['blocker']);
-
-    let bodyBlocker = (body.blocker == 'true');
-
-    tasks.findOneAndUpdate({id: ID}, {$set:{blocker: bodyBlocker}}).then((doc)=>{
-        res.send(doc);
-    }).catch((e) =>{
-        res.status(400).send(e)
+app.post('/add_project',authenticate, (req,res)=>{
+    let project  = new Projects({
+        name: req.body.name,
+        admin: req.user.id
     });
-    
-});
-
-app.patch('/done_task/:id', (req,res)=>{
-    let ID = req.params.id;
-    let body = _.pick(req.body,['done']);
-
-    let bodyDone = (body.done == 'true');
-
-    tasks.findOneAndUpdate({id: ID}, {$set:{done: bodyDone}}).then((doc)=>{
-        res.send(doc);
-    }).catch((e) =>{
-        res.status(400).send(e)
+  
+    project.save().then((docs)=>{
+      res.send(docs)
+    }, (e) =>{
+        console.log(e);
+        res.status(400).sendFile(__dirname + "/static/error.html");
     });
+  });
+  
+// app.patch('/block_task/:id',authenticate, (req,res)=>{
+//     let ID = req.params.id;
+//     let body = _.pick(req.body,['blocker']);
+
+//     let bodyBlocker = (body.blocker == 'true');
+
+//     tasks.findOneAndUpdate({id: ID,
+//     _creator: req.user.id}, {$set:{blocker: bodyBlocker}}).then((doc)=>{
+//         res.send(doc);
+//     }).catch((e) =>{
+//         res.status(400).send(e)
+//     });
     
-});
+// });
+
+// app.patch('/done_task/:id',authenticate, (req,res)=>{
+//     let ID = req.params.id;
+//     let body = _.pick(req.body,['done']);
+
+//     let bodyDone = (body.done == 'true');
+
+//     tasks.findOneAndUpdate({id: ID,
+//         _creator: req.user.id}, {$set:{done: bodyDone}}).then((doc)=>{
+//         res.send(doc);
+//     }).catch((e) =>{
+//         res.status(400).send(e)
+//     });
+    
+// });
 
 
-app.delete('/delete_task/:id',(req,res)=>{
-    let ID = req.params.id;
+// app.delete('/delete_task/:id',authenticate,(req,res)=>{
+//     let ID = req.params.id;
 
-    tasks.find({id: ID}).then((docs)=>{
-        if(!docs){
-            return res.status(404).send();
-        }
+//     tasks.findOne({
+//         id: ID,
+//         _creator: req.user.id
+//     }).then((docs)=>{
+//         if(!docs){
+//             return res.status(404).send();
+//         }
         
-        if(docs.length > 0){
-            docs.forEach(doc => doc.remove());
-        }
-        return res.status(200).send();
-    })
-})
+//         if(docs.length > 0){
+//             docs.forEach(doc => doc.remove());
+//         }
+//         return res.status(200).send();
+//     })
+// })
 
 
-app.get('/get_tasks',authenticate,(req,res)=>{
-    tasks.find({
-        _creator: req.user.id
+// app.get('/get_tasks',authenticate,(req,res)=>{
+//     tasks.find({
+//         _creator: req.user.id
+//     }).then((docs) =>{
+//         res.send({docs})
+//     },(e)=>{
+//         res.status(400).send(e);
+//     })
+// })
+
+app.get('/get_projects',authenticate,(req,res)=>{
+    Projects.find({
+        admin: req.user.id
     }).then((docs) =>{
         res.send({docs})
     },(e)=>{
         res.status(400).send(e);
+    });
+});
+
+app.post('/create_task/admin',authenticate, (req, res) =>{
+    Projects.findOne({
+        admin: req.user.id,
+        name: req.body.projectName
+    }).then((project) => {
+        User.findOne({
+            email: req.body.assigneeEmail
+        }).then((user) => {
+            task = {
+                id: parseInt(req.body.taskId),
+                text: req.body.text,
+                dueDate: new Date(req.body.dueDate),
+                priority: parseInt(req.body.priority),
+                assignee: user._id
+            }
+            project.tasks.push(task);
+            project.save().then((docs) => {
+                res.send({docs});
+            }, (e) => {
+                res.status(400).send(e);
+            })
+        }, (e) => {
+            console.log(e);
+            res.status(400).send(e);
+        })
+    }, (e) => {
+        console.log(e);
+        res.status(400).send(e);
+    });
+});
+
+app.get('/get_tasks', authenticate, (req, res) => {
+    Projects.findOne({
+        'tasks.assignee': req.user.id
+    }).then((doc) => {
+        res.send({doc});
+    }, (e) => {
+        res.status(400).sendFile(__dirname + "static/error.html");
+    });
+});
+
+app.post('/create_task', authenticate, (req, res) => {
+   Projects.findOneAndUpdate({
+       'task.assignee': req.user.id
+   },
+   {
+       '$push': {
+           'tasks':{
+               'id':req.body.taskId,
+               'text':req.body.taskText,
+               'dueDate':req.body.taskDueDate,
+               'priority':req.body.taskPriority,
+               'assignee':req.body
+           }
+       }
+   }).then((doc) => {
+       res.send('Success');
+   }, (e) => {
+       console.log(e);
+       res.status(400).sendFile(__dirname + "static/error.html");
+   }) 
+});
+
+app.patch('/update_task', authenticate, (req, res) => {
+    Projects.findOneAndUpdate({
+        'task.assignee': req.user.id
     })
 })
-
-
 
 app.listen(3000, ()=>{
     console.log('started on port 3000')

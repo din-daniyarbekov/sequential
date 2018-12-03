@@ -14,36 +14,36 @@ const UserSchema = new mongoose.Schema({
         trim: true
     },
     email: {
-		type: String,
-		required: true,
-		minlength: 1,
-		trim: true, // trim whitespace
-		unique: true,
-		validate: {
-			validator: validator.isEmail,
-			message: 'Not valid email'
-		}
-	},
-	password: {
-		type: String,
-		required: true,
-		minlength: 6
-	},
-	userType:{
-		type:String,
-		required: true,
-		default: 'user'
-	},
-	tokens:[{
-		access: {
 			type: String,
-			required: true	
+			required: true,
+			minlength: 1,
+			trim: true, // trim whitespace
+			unique: true,
+			validate: {
+				validator: validator.isEmail,
+				message: 'Not valid email'
+			}
 		},
-		token: {
+		password: {
 			type: String,
-			required: true
-		}
-	}]
+			required: true,
+			minlength: 5
+		},
+		isAdmin:{
+			type:Boolean,
+			required:true,
+			default: false
+		},
+		tokens:[{
+			access: {
+				type: String,
+				required: true	
+			},
+			token: {
+				type: String,
+				required: true
+			}
+		}]
 })
 
 UserSchema.methods.generateAuthToken = function () {
