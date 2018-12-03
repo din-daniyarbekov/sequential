@@ -1,0 +1,29 @@
+{
+  "name": "team42",
+  "version": "1.0.0",
+  "description": "1. Index.html - \"Sign-in\"<br/>      You can sign-in by using both User and Admin profile. <br/>      In order to sign-in as a User, use \"user@mail.com\" for the email and \"12345\" for the password.<br/>      In order to sign-in as an Admin, use \"admin@mail.com\" for the email and \"6789\" for the password.<br/>",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/csc309-fall-2018/team42.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/csc309-fall-2018/team42/issues"
+  },
+  "homepage": "https://github.com/csc309-fall-2018/team42#readme",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.15.2",
+    "express": "^4.14.0",
+    "express-session": "^1.15.6",
+    "jsonwebtoken": "^7.1.9",
+    "lodash": "^4.15.0",
+    "mongoose": "^4.5.9",
+    "validator": "^10.9.0"
+  }
+}

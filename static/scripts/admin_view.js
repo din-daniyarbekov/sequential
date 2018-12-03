@@ -206,7 +206,7 @@ const taskComponent = Vue.component('task',{
             }
         },
         deleteMethod: function(event){
-            this.project.tasks = this.project.tasks.filter(this.taskFilter);
+            this.project.tasks = this.project.tasks.filter(makeTaskFilter(this.task));
             this.project.blockedTasks = this.project.blockedTasks.filter(makeTaskFilter(this.task));
             this.project.completedTasks = this.project.completedTasks.filter(makeTaskFilter(this.task));
         }
