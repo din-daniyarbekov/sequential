@@ -25,6 +25,8 @@ app.use(bodyParser.urlencoded({ extended:true }))
     }
 */
 
+// serve the static files
+app.use(express.static('static'))
 
 app.use(session({
 	secret: 'oursecret',
@@ -40,6 +42,12 @@ app.use(session({
 app.get('/',(req,res)=>{
     res.redirect('./login');
 })
+
+app.route('/registration')
+  .get((req, res) => {
+    res.sendFile(__dirname + '/static/account-creation.html')
+    })
+
 
 
 app.route('/login')
@@ -87,7 +95,7 @@ app.delete('/users/logout',authenticate,(req,res)=>{
 })
 
 
-app.post('/users/registration',(req,res)=>{
+app.post('/registration',(req,res)=>{
     let body = _.pick(req.body, ['name','email','password','isAdmin']);
     let user = new User(body);
 
@@ -96,6 +104,7 @@ app.post('/users/registration',(req,res)=>{
       }).then((token) => {
         res.header('x-auth', token).send(user);
       }).catch((e) => {
+        
         res.status(400).send(e);
       })
 });
