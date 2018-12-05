@@ -14,29 +14,36 @@
               <div class="card card-signin my-5">
                 <div class="card-body">
                   <h5 class="card-title text-center"><b>Create Profile</b></h5>
-                    <form class="form-signin">
+                    <form id="formSignIn">
                         <div class="form-group">
-                          <label for="exampleInputEmail">Email address</label>
+                          <label for="exampleInputName">Enter your Name</label>
+                          <input type="text" class="form-control" id="exampleInputName" placeholder="Name">
+                        </div>
+
+                        <div class="form-group">
+                          <label for="exampleInputEmail">Enter your Email address</label>
                           <input type="email" class="form-control" id="exampleInputEmail" aria-describedby="emailHelp" placeholder="Enter email">
                         </div>
                         <div class="form-group">
-                          <label for="exampleInputPassword">Enter password</label>
-                          <input type="password" class="form-control" id="exampleInputPassword" placeholder="Password">
+                          <label for="exampleInputPassword">Enter your password</label>
+                          <input type="password" class="form-control" id="exampleInputPassword" placeholder="Enter password">
                         </div>
                         <div class="form-group">
-                          <label for="repeatPassword">Repeat your password</label>
-                          <input type="password" class="form-control" id="repeatPasswordPassword" placeholder="">
+                          <label for="repeatPasswordPassword">Repeat your password</label>
+                          <input type="password" class="form-control" id="repeatPasswordPassword" placeholder="Repeat">
                         </div>
 
-                        <p>Select your user category</p>
-                        <select class="user-selection">
+                        
+                        <div class ="form-group">
+                        <label for="userTypeSelection">Select your user category</label>
+                        <select id="userTypeSelection">
                             <option value="user">User</option>
                             <option value="admin">Admin</option>
-                          </select>
+                        </select>
                         
                         <button type="submit" class="btn btn-lg btn-primary btn-block text-uppercase">Submit</button>
                         <!-- call server here and send new account data -->
-                      </form>
+                    </form>
 
 
                 </div>
