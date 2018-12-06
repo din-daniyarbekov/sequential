@@ -84,6 +84,10 @@ const ProjectSchema = new mongoose.Schema({
             assignee:{
                 type: mongoose.Schema.ObjectId,
                 required: true
+            },
+            assigneeEmail:{
+                type: String,
+                required: true
             }
         }],
         default:[]
@@ -103,9 +107,9 @@ const ProjectSchema = new mongoose.Schema({
                 required: true,
 			    minlength: 1,
 			    trim: true,
-			    unique: true
+                unique: true,
+                sparse: true
             }
-
         }],
         default:[]
     }
