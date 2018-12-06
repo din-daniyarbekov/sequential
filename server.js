@@ -129,24 +129,46 @@ app.post('/registration',(req,res)=>{
 
 app.post('/admin/invite_user',authenticate,(req,res)=>{
     Projects.find({
-        admin: req.user.id}).then((supervisedProjects) =>{
-       
-        const requiredProject = supervisedProjects.find(function(project){
-            return project.name === req.body.projectName;
-        })
+        admin: req.user.id,
+    name: req.body.projectName}).then((requiredProjects) =>{
 
-       user = {
-           name: req.body.name,
-           email: req.body.email
-       }
+    var requiredProject; 
+    try{
+        requiredProject = requiredProjects[0];
 
-       requiredProject.projectUsers.push(user);
-       requiredProject.save().then((docs) =>{
-           res.send(docs);
-       },(e) =>{
-           console.log(e)
-           res.status(400).sendFile(__dirname + "/static/error.html");
-       })
+    } catch(e){
+        return res.status(500).send(e)
+    }
+    
+
+    user = {
+        name: req.body.name,
+        email: req.body.email
+    }
+
+    const duplicateUser = requiredProject.projectUsers.find((projUser)=>{
+        return projUser.email === user.email;
+    })
+
+    if(!duplicateUser){
+        requiredProject.projectUsers.push(user);
+    } else{
+
+    }
+    requiredProject.save().then((docs) =>{
+        //not sure which link should it be
+        data.to = user.name;
+        data.subject = `Sequential: You're invited`
+            data.text = `Please go`;
+            mailgun.messages().send(data, function (error, body) {
+        console.log(body);
+        });  
+
+        res.send(docs);
+    },(e) =>{
+        console.log(e)
+        res.status(400).sendFile(__dirname + "/static/error.html");
+    })
 
     },(e)=>{
         res.status(400).send(e);
@@ -156,22 +178,6 @@ app.post('/admin/invite_user',authenticate,(req,res)=>{
 
 
 
-// app.post('/add_task',authenticate, (req,res)=>{
-//   let task  = new tasks({
-//       description: req.body.description,
-//       id: req.body.id,
-//       blocker: req.body.blocker,
-//       dueDate: req.body.date,
-//       _creator: req.user.id
-//   });
-
-//   task.save().then((docs)=>{
-//     res.send(docs)
-//   }, (e) =>{
-//     res.send(e);
-//   });
-// });
-
 app.post('/admin/add_project',authenticate, (req,res)=>{
    if(req.user.isAdmin){
     let project  = new Projects({
@@ -179,7 +185,8 @@ app.post('/admin/add_project',authenticate, (req,res)=>{
         admin: req.user.id
     });
     project.save().then((docs)=>{
-      res.send(docs)
+
+    res.send(docs)
     }, (e) =>{
         console.log(e);
         res.status(400).sendFile(__dirname + "/static/error.html");
@@ -259,43 +266,24 @@ app.get('/admin/get_projects',authenticate,(req,res)=>{
     });
 });
 
-app.patch('/admin/update_task',authenticate, (req, res) => {
-    Projects.findOneAndUpdate({
-        admin:req.user.id,
-        name:req.body.projectName,
-        "tasks.assignee" : req.body.assigneeEmail
-    }, {
-        '$set':{
-            'tasks.$':{
-                "done":req.body.done,
-                "blocker":req.body.blocker
-            }
-        }
-    }, function(err, project){
-        if(err){
-            res.status(500).send("Failure");
-        }else{
-            res.status(200).send("Success");
-        }
-    });
-});
 
-app.delete('/admin/delete_task', authenticate, (req, res) => {
-    Projects.findOneAndUpdate({
-        admin:req.user.id,
-        name:req.body.projectName
-    },{
-        '$pull': {
-            'tasks': {
-                'id':req.body.taskId
-            }
-        }
-    }).then((project) => {
-        res.status(200).send("Success");
-    }).catch((error) => {
-        res.status(500).send("Failure");
-    })
-})
+
+// app.delete('/admin/delete_task', authenticate, (req, res) => {
+//     Projects.findOneAndUpdate({
+//         admin:req.user.id,
+//         name:req.body.projectName
+//     },{
+//         '$pull': {
+//             'tasks': {
+//                 'id':req.body.taskId
+//             }
+//         }
+//     }).then((project) => {
+//         res.status(200).send("Success");
+//     }).catch((error) => {
+//         res.status(500).send("Failure");
+//     })
+// })
 
 
 
@@ -308,7 +296,11 @@ app.post('/admin/create_task',authenticate, (req, res) =>{
         User.findOne({
             email: req.body.email
         }).then((user) => {
-            const task = {
+            try{
+            
+            var task;
+           
+            task = {
                 id: parseInt(req.body.taskId),
                 text: req.body.text,
                 dueDate: new Date(req.body.dueDate),
@@ -317,20 +309,25 @@ app.post('/admin/create_task',authenticate, (req, res) =>{
                 assigneeEmail: req.body.email
             }
             project.tasks.push(task);
-
+       
             project.save().then((docs) => {
-                data = {}
-                data.to = req.body.email;
+
+                data.to = task.email;
                 data.subject = 'Sequential: Task Assigned'
-                data.text = `You have a new task, ${task.text}`;
+                data.text = `You have a new task, ${req.body.text}`;
                 mailgun.messages().send(data, function (error, body) {
                     console.log(body);
+                  }, (e)=>{
+                      console.log(e)
                   });
                 res.send({docs});
             }, (e) => {
                 console.log(e);
                 res.status(400).send(e);
             })
+        } catch(e){
+            return res.status(400).send(e);
+        }
         }, (e) => {
             console.log(e);
             res.status(400).send(e);
@@ -349,30 +346,44 @@ app.post('/user/create_task',authenticate, (req, res) =>{
         'projectUsers.email': user.email
     }).then((project) => {
         try{
+
             task = {
                 id: parseInt(req.body.taskId),
                 text: req.body.text,
                 dueDate: new Date(req.body.dueDate),
                 priority: parseInt(req.body.priority),
-                assignee: user._id
+                assignee: user._id,
+                assigneeEmail: user.email
             }
-            } catch(e){
-                res.status(400).send(e);
-            }
+            console.log(user);
+            console.log(project)
+           
             project.tasks.push(task);
 
             project.save().then((docs) => {
-                data.to = req.body.email;
-                data.subject = 'Sequential: Task Assigned'
-                data.text = `You assigned yourself a new task, ${task.text}`;
-                mailgun.messages().send(data, function (error, body) {
-                    console.log(body);
-                });
-                res.send(docs);
+
+                User.findById(project.admin).then((admin) => {
+                    data.to = admin.email;
+
+                    data.subject = 'Sequential: Task Created';
+                    data.text = `The following task is created: ${task.text}`;
+
+                    mailgun.messages().send(data, function (error, body) {
+                        if(error){
+                            res.status(500).send(error);
+                        }else{
+                            console.log(body);
+                        }
+                      });
+                    res.send(docs); 
+                })
             }, (e) => {
                 console.log(e);
                 res.status(400).send(e);
             })
+        } catch(e){
+            res.status(400).send(e);
+        }
         }, (e) => {
             console.log(e);
             res.status(400).send(e);
@@ -406,10 +417,6 @@ app.post('/user/create_task',authenticate, (req, res) =>{
 
 
     
-//
-///mg.javednissar.me
-
-//postmaster@mg.javednissar.me
 
 
 app.get('/user/get_tasks', authenticate, (req, res) => {
@@ -444,32 +451,18 @@ app.get('/user/get_tasks', authenticate, (req, res) => {
 //    }) 
 // });
 
-app.delete('/user/delete_task', authenticate, (req, res) => {
-    User.findById(req.user.id).then((user) => {
-        Projects.findOneAndUpdate({
-            'projectUsers.email': user.email
-        }, {
-            '$pull': {
-                'tasks': {
-                    'id':body.taskId
-                }
-            }
-        }).then((project) => {
-            res.status(200).send("Success");
-        }).catch((e) =>{
-            console.log(e);
-            res.status(400).send(e);
-        });
-    }).catch((e) => {
-        res.status(500).send(e);
-    });
-});
+
+
+
+
 
 app.patch('/user/update_task', authenticate, (req, res) => {
     User.findById(req.user.id).then((user) => {
         Projects.findOne({
             'projectUsers.email': user.email
         }).then((project) => {
+            console.log(project);
+
                 const done = req.body.done;
                 const blocker = req.body.blocker;
                 try{
@@ -479,14 +472,16 @@ app.patch('/user/update_task', authenticate, (req, res) => {
                             task.done = done;
                         }
                     });
-                } catch(e){
-                        res.status(400).send(e);
-                }
+                
+                const task = project.tasks.find(task =>{
+                        return task.id == req.body.taskId;
+                })
+
+
 
 
                 project.save().then((docs) => {
                     User.findById(project.admin).then((admin) => {
-                        data = {}
                         data.to = admin.email;
                         if(done){
                             data.subject = 'Sequential: Task Done';
@@ -503,13 +498,15 @@ app.patch('/user/update_task', authenticate, (req, res) => {
                             }
                           });
                         res.send(docs); 
-                    }).catch((e) => {
-                        res.status(500).send(e);
-                    });
-                }, (e) => {
-                    console.log(e);
+                    })
+                } , (e) => {
+                    console.log("error");
                     res.status(400).send(e);
                 })
+            }catch(e){
+                    console.log("error");
+                    return res.status(400).send(e);
+            } 
             }, (e) => {
                 console.log(e);
                 res.status(400).send(e);
@@ -521,12 +518,66 @@ app.patch('/user/update_task', authenticate, (req, res) => {
     });
 
 
+    app.delete('/admin/delete_task', authenticate, (req, res) => {
+        User.findById(req.user.id).then((admin) => {
+            Projects.findOne({
+                admin: admin._id,
+                name: req.body.projectName
+            }).then((project) => {
+                    
+                    console.log(project);
+                    const filteredTasks = project.tasks.filter((task)=>{
+                        return task.id != req.body.taskId;
+                    })
+
+                    const deletedTask = project.tasks.find((task)=>{
+                        return task.id == req.body.taskId;
+                    })
+
+                    project.tasks = filteredTasks;
+                    project.save().then((docs) => {
+
+                    data.to = deletedTask.assigneeEmail;
+                    data.subject = 'Sequential: Task Deleted'
+                    data.text = `Deleted the task: ${deletedTask.text} in ${project.name}`;
+                    mailgun.messages().send(data, function (error, body) {
+                    console.log(body);
+                    },(e)=>{
+                        console.log(e);
+                    });  
+
+                        res.status(200).send(docs); 
+                    }, (e) => {
+                        console.log(e);
+                        res.status(400).send(e);
+                    })
+                }, (e) => {
+                    console.log(e);
+                    res.status(400).send(e);
+                })
+            }).catch((e) =>{
+                console.log(e);
+                res.status(400).send(e);
+            });
+        });
+
+    
 
 
-    app.patch('/change_account_details', authenticate, (req, res) => {
 
-            
+    app.patch('/change_account_details', authenticate, (req, res) => {            
             User.findById(req.user.id).then((user) => {
+
+                if(user.isAdmin){
+                    try{
+                        user.password = req.body.password;
+                        user.email = req.body.email;
+                    } catch(e){
+                        res.status(400).send(e)
+                    }
+                    res.send(user);
+                }
+                else{
                 Projects.findOne({
                     'projectUsers.email': user.email
                 }).then((project) => {
@@ -564,6 +615,7 @@ app.patch('/user/update_task', authenticate, (req, res) => {
                             console.log(e);
                             res.status(400).send(e);
                         })
+                    }
                 }).catch((e) =>{
                     console.log(e);
                     res.status(400).send(e);
