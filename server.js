@@ -181,9 +181,17 @@ app.post('/admin/add_project',authenticate, (req,res)=>{
         name: req.body.name,
         admin: req.user.id
     });
-  
+
+    //not sure which link should it be here
     project.save().then((docs)=>{
-      res.send(docs)
+        data.to = req.body.email;
+        data.subject = `Sequential: You're invited`
+        data.text = `Please go, ${link}`;
+        mailgun.messages().send(data, function (error, body) {
+            console.log(body);
+          });  
+      
+    res.send(docs)
     }, (e) =>{
         console.log(e);
         res.status(400).sendFile(__dirname + "/static/error.html");
@@ -376,10 +384,6 @@ app.post('/user/create_task',authenticate, (req, res) =>{
 
 
     
-//
-///mg.javednissar.me
-
-//postmaster@mg.javednissar.me
 
 
 app.get('/user_view/get_tasks', authenticate, (req, res) => {
@@ -458,6 +462,37 @@ app.patch('/user/update_task', authenticate, (req, res) => {
             res.status(400).send(e);
         });
     });
+
+    
+
+    app.delete('/user/delete_task', authenticate, (req, res) => {
+        User.findById(req.user.id).then((user) => {
+            Projects.findOne({
+                'projectUsers.email': user.email
+            }).then((project) => {
+                    
+    
+                    project.save().then((docs) => {
+                        data.to = user.email;
+                        data.subject = 'Sequential: Task Assigned'
+                        data.text = `You've an updated a task, ${task.text}`;
+                        mailgun.messages().send(data, function (error, body) {
+                            console.log(body);
+                          });
+                        res.send({docs});
+                    }, (e) => {
+                        console.log(e);
+                        res.status(400).send(e);
+                    })
+                }, (e) => {
+                    console.log(e);
+                    res.status(400).send(e);
+                })
+            }).catch((e) =>{
+                console.log(e);
+                res.status(400).send(e);
+            });
+        });
 
 
 
