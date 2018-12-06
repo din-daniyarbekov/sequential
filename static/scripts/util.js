@@ -52,3 +52,9 @@ const relativeTimeOfTask = function(task){
         return 4;
     }
 }
+
+const constantHeaders = {
+    'Accept': 'application/json, text/plain, */*',
+    'Content-Type': 'application/json',
+    'x-auth':sessionStorage.getItem('token')
+} 
