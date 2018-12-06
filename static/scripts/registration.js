@@ -42,24 +42,18 @@ function registration(e){
                         .then(function(res) {
                             
                             if (res.status === 200) {
-                                sessionStorage.setItem("token", res.tokens[1])   
-                                // if(isAdmin){
-                                //     window.location = '../admin_view.html';
-                                // } else {
-                                //     window.location = '../user_view.html';
-                                // }
+                                return res.json();
                             } else {
                                 window.alert(res.status, res.body)
                                 window.alert('There was an error when attempting to create your account')
                             }
-                            console.log(res)
+                        }).then(function(json){
+                            sessionStorage.setItem("token",json.tokens[0].token);
                         }).catch((error) => {
                             console.log(error)
                         })
-                    } else {
-                        window.alert('Password entries do not match')
-                    }
-                } else {
+                    } 
+               } else {
                     window.alert ('Passwords must contain at least 5 characters')
                 }
             } else {
