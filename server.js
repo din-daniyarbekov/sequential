@@ -78,7 +78,7 @@ app.post('/users/login', (req, res) => {
         const password = req.body.password
     
         User.findByEmailPassword(email, password).then((user) => {
-                res.send(user.tokens[0]);
+                res.send({token:user.tokens[0].token, isAdmin: user.isAdmin});
         }).catch((error) => {
             res.status(400).send()
         })
@@ -174,12 +174,10 @@ app.post('/admin/invite_user',authenticate,(req,res)=>{
 
 app.post('/admin/add_project',authenticate, (req,res)=>{
    if(req.user.isAdmin){
-
     let project  = new Projects({
         name: req.body.name,
         admin: req.user.id
     });
-  
     project.save().then((docs)=>{
       res.send(docs)
     }, (e) =>{
@@ -315,7 +313,8 @@ app.post('/admin/create_task',authenticate, (req, res) =>{
                 text: req.body.text,
                 dueDate: new Date(req.body.dueDate),
                 priority: parseInt(req.body.priority),
-                assignee: user._id
+                assignee: user._id,
+                assigneeEmail: req.body.email
             }
             project.tasks.push(task);
 
@@ -413,7 +412,7 @@ app.post('/user/create_task',authenticate, (req, res) =>{
 //postmaster@mg.javednissar.me
 
 
-app.get('/user_view/get_tasks', authenticate, (req, res) => {
+app.get('/user/get_tasks', authenticate, (req, res) => {
     Projects.findOne({
         'tasks.assignee': req.user.id
     }).then((doc) => {
@@ -514,7 +513,7 @@ app.patch('/user/update_task', authenticate, (req, res) => {
             }, (e) => {
                 console.log(e);
                 res.status(400).send(e);
-            })
+            });
         }).catch((e) =>{
             console.log(e);
             res.status(400).send(e);
