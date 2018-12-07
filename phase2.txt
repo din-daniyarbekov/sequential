@@ -1,4 +1,5 @@
 Please note that we received a 1 day extension from Professor Kazakevich as stated in a previous email
+Also note that users must be invited before they can be registered, we did not have the time to implement the validation to prevent un-invited users from registering.
 
 Our project can be accessed with this link:
 https://polar-ocean-74397.herokuapp.com/
