@@ -107,13 +107,9 @@ const ProjectSchema = new mongoose.Schema({
                 type: String,
                 required: true,
 			    minlength: 1,
-<<<<<<< HEAD
-                trim: true            
-=======
 			    trim: true,
                 unique: true,
                 sparse: true
->>>>>>> 3f50bde52005c1f4d5c55e689ca88e8617b327c6
             }
         }],
         default:[]
