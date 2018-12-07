@@ -252,7 +252,9 @@ fetch(request).then(function(res){
             task: taskComponent
         },
         methods:{
-    
+            removeWhitespace: function(text){
+                return text.split(' ').join('');
+            },
             inviteUser:function(project){
                 const foundUser = project.users.find(foundUserFunction(this.inviteUserEmail));
                 if(this.inviteUserName){
@@ -350,8 +352,12 @@ fetch(request).then(function(res){
             },
     
             createProject:function(){
-                
-                if (this.newProjectText){
+                function makeFindProjectFunc(projectName){
+                    return (project) => {
+                        project.name === projectName;
+                    }
+                }
+                if (this.newProjectText && this.projects.find(makeFindProjectFunc(this.newProjectText) === undefined)){
                     const createProjectRequest = new Request('/admin/add_project', {
                         method: 'post',
                         body:JSON.stringify({"name":this.newProjectText}), 
