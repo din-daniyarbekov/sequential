@@ -136,6 +136,8 @@ const taskComponent = Vue.component('task',{
                 </div>
                 <div class="col text-center">
                     <div> <span>{{task.assignee.name}}</span></div>
+                    <span v-show="task.done" class="badge badge-success">DONE</span>
+                    <span v-show="task.blocked" class="badge badge-danger">BLOCKED</span>
                     <span v-show="task.priority == 1" class="badge badge-warning">IMPORTANT</span>
                     <span v-show="task.priority == 2" class="badge badge-danger">URGENT</span>
                     <span v-show="relativeTime == 0" class="badge badge-danger">OVERDUE</span>
@@ -182,9 +184,9 @@ const validateEmail = (email) => {
 }
 
 
-const foundUserFunction = function(emailToFind){
+const foundUserFunction = function(emailToFind, nameToFind){
     return function(user){
-        return user.email === emailToFind;
+        return user.email === emailToFind || user.name === nameToFind;
     }
 }
 
@@ -256,7 +258,7 @@ fetch(request).then(function(res){
                 return text.split(' ').join('');
             },
             inviteUser:function(project){
-                const foundUser = project.users.find(foundUserFunction(this.inviteUserEmail));
+                const foundUser = project.users.find(foundUserFunction(this.inviteUserEmail, this.inviteUserName));
                 if(this.inviteUserName){
                     if(validateEmail(this.inviteUserEmail) && foundUser === undefined){
                         let newUserId = 1;
@@ -357,7 +359,7 @@ fetch(request).then(function(res){
                         project.name === projectName;
                     }
                 }
-                if (this.newProjectText && this.projects.find(makeFindProjectFunc(this.newProjectText) === undefined)){
+                if (this.newProjectText && this.projects.find(makeFindProjectFunc(this.newProjectText)) === undefined){
                     const createProjectRequest = new Request('/admin/add_project', {
                         method: 'post',
                         body:JSON.stringify({"name":this.newProjectText}), 

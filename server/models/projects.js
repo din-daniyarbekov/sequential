@@ -1,52 +1,6 @@
 let mongoose = require('mongoose');
 
-// let projects = mongoose.model('Projects',{
-//     name: {
-//         type: String,
-//         required: true,
-//         minlength: 1
-//     },
-//     tasks: [{
-//         id: {
-//             type: Number
-//         },
-//         text: {
-//             type: String,
-//             maxlength: 300,
-//             minlength: 5
-//         },
-//         blocker: {
-//             type: Boolean,
-//             default: false
-//         },
-//         done: {
-//             type: Boolean,
-//             default: false
-//         },
-//         dueDate: {
-//             type: Date,
-//             required: true
-//         },
-//         priority: {
-//             type: Number,
-//             default: 0
-//         },
-//         assignee:{
-//             type: mongoose.Schema.Types.ObjectId,
-//             required: true
-//         },
-//     }],
-//     admin: {
-//         type: mongoose.Schema.Types.ObjectId,
-//         required: true
-//     },
-//     users:[{
-//         type: mongoose.Schema.TypesObjectId,
-//         default: null
-//     }]
-
-// });
-
+//Projects model
 const ProjectSchema = new mongoose.Schema({
     name: {
         type: String,

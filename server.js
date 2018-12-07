@@ -86,7 +86,8 @@ app.post('/users/login', (req, res) => {
         }).catch((error) => {
             debugger;
             res.status(400).send(error);
-        })
+        }) 
+        
     })
 
 
@@ -131,6 +132,12 @@ app.post('/registration',(req,res)=>{
       })
 });
 
+function makeInviteURL(){
+    if(process.env.PORT){
+        return "https://polar-ocean-74397.herokuapp.com/account-creation.html";
+    }
+    return "localhost:3000/index.html";
+}
 
 app.post('/admin/invite_user',authenticate,(req,res)=>{
     Projects.find({
@@ -163,8 +170,8 @@ app.post('/admin/invite_user',authenticate,(req,res)=>{
     requiredProject.save().then((docs) =>{
         data.to = req.body.email;
         data.subject = `Sequential: You're invited to ${req.body.projectName}`;
-        //add Heroku link here
-        data.text = `Please go`;
+        const inviteURL = makeInviteURL();
+        data.text = `Please go to ${inviteURL}`;
         mailgun.messages().send(data, function (error, body) {
             console.log(body);
         });  
@@ -201,65 +208,7 @@ app.post('/admin/add_project',authenticate, (req,res)=>{
    }
   });
   
-// app.patch('/block_task/:id',authenticate, (req,res)=>{
-//     let ID = req.params.id;
-//     let body = _.pick(req.body,['blocker']);
 
-//     let bodyBlocker = (body.blocker == 'true');
-
-//     tasks.findOneAndUpdate({id: ID,
-//     _creator: req.user.id}, {$set:{blocker: bodyBlocker}}).then((doc)=>{
-//         res.send(doc);
-//     }).catch((e) =>{
-//         res.status(400).send(e)
-//     });
-    
-// });
-
-// app.patch('/done_task/:id',authenticate, (req,res)=>{
-//     let ID = req.params.id;
-//     let body = _.pick(req.body,['done']);
-
-//     let bodyDone = (body.done == 'true');
-
-//     tasks.findOneAndUpdate({id: ID,
-//         _creator: req.user.id}, {$set:{done: bodyDone}}).then((doc)=>{
-//         res.send(doc);
-//     }).catch((e) =>{
-//         res.status(400).send(e)
-//     });
-    
-// });
-
-
-// app.delete('/delete_task/:id',authenticate,(req,res)=>{
-//     let ID = req.params.id;
-
-//     tasks.findOne({
-//         id: ID,
-//         _creator: req.user.id
-//     }).then((docs)=>{
-//         if(!docs){
-//             return res.status(404).send();
-//         }
-        
-//         if(docs.length > 0){
-//             docs.forEach(doc => doc.remove());
-//         }
-//         return res.status(200).send();
-//     })
-// })
-
-
-// app.get('/get_tasks',authenticate,(req,res)=>{
-//     tasks.find({
-//         _creator: req.user.id
-//     }).then((docs) =>{
-//         res.send({docs})
-//     },(e)=>{
-//         res.status(400).send(e);
-//     })
-// })
 
 app.get('/admin/get_projects',authenticate,(req,res)=>{
     Projects.find({
@@ -273,22 +222,6 @@ app.get('/admin/get_projects',authenticate,(req,res)=>{
 
 
 
-// app.delete('/admin/delete_task', authenticate, (req, res) => {
-//     Projects.findOneAndUpdate({
-//         admin:req.user.id,
-//         name:req.body.projectName
-//     },{
-//         '$pull': {
-//             'tasks': {
-//                 'id':req.body.taskId
-//             }
-//         }
-//     }).then((project) => {
-//         res.status(200).send("Success");
-//     }).catch((error) => {
-//         res.status(500).send("Failure");
-//     })
-// })
 
 
 
@@ -316,7 +249,7 @@ app.post('/admin/create_task',authenticate, (req, res) =>{
                 }
                 project.tasks.push(task);
                 project.save().then((docs) => {
-                    data.to = task.email;
+                    data.to = task.assigneeEmail;
                     data.subject = 'Sequential: Task Assigned'
                     data.text = `You have a new task, ${req.body.text}`;
                     debugger;
@@ -399,27 +332,6 @@ app.post('/user/create_task',authenticate, (req, res) =>{
     });
 });
 
-// app.post('/user/create_task',authenticate, (req, res) =>{
-//     Projects.findOne({
-//         'users.user._id': req.user.id}).then((project) => {
-//             task = {
-//                 id: parseInt(req.body.taskId),
-//                 text: req.body.text,
-//                 dueDate: new Date(req.body.dueDate),
-//                 priority: parseInt(req.body.priority),
-//                 assignee: req.user.id
-//             }
-//             project.tasks.push(task);
-//             console.log(project);
-
-//         }, (e) => {
-//             console.log(e);
-//             res.status(400).send(e);
-//         })
-//     });
-
-
-
 
     
 
@@ -434,27 +346,7 @@ app.get('/user/get_tasks', authenticate, (req, res) => {
     });
 });
 
-// app.post('/user_view/create_task', authenticate, (req, res) => {
-//    Projects.findOneAndUpdate({
-//        'task.assignee': req.user.id
-//    },
-//    {
-//        '$push': {
-//            'tasks':{
-//                'id':req.body.taskId,
-//                'text':req.body.taskText,
-//                'dueDate':req.body.taskDueDate,
-//                'priority':req.body.taskPriority,
-//                'assignee':req.body
-//            }
-//        }
-//    }).then((doc) => {
-//        res.send(doc);
-//    }, (e) => {
-//        console.log(e);
-//        res.status(400).sendFile(__dirname + "static/error.html");
-//    }) 
-// });
+
 
 
 
@@ -591,7 +483,7 @@ app.patch('/user/update_task', authenticate, (req, res) => {
 
                         return res.status(200).send();
                     },(e) =>{
-                        res.status(400).send(e);
+                        return res.status(400).send(e);
                     })
                 }
                 else{
@@ -609,6 +501,12 @@ app.patch('/user/update_task', authenticate, (req, res) => {
                                 projUser.email = email;
                             }
                           });
+
+                        project.tasks.forEach(task => {
+                            if(task.assigneeEmail === user.email){
+                                task.assigneeEmail = email;
+                            }
+                        });
 
         
                         project.save().then((projInfo) => {

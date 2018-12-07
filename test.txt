@@ -1,0 +1,57 @@
+Account Creation
+========
+1. Admin Registration
+--------
+I. Go to /account-creation.html
+II. Register account details for Admin
+2. User Registration
+--------
+I. Go to /account-creation.html
+II. Register account details for User
+3. User Registration through Email Link
+------------
+I. Click on link in Email
+II. Register account details for User
+Account Settings
+========
+
+3. Set Email and Password as Admin
+--------
+I. Go to /account_settings.html
+II. Write new Email and Password
+III. Apply Changes annd Log-out
+IV. Log-in with new Email and Password
+4. Set Email and Password as User
+--------
+I. Go to /account_settings.html
+II. Write new Email and Password
+III. Apply Changes and Log-out
+IV. Log-in with new Email and Password
+V. Verify that Email changed in all associated tasks
+Log-in
+========
+-Can admin log in?
+-Can user log in?
+-Can user log in after logging out?
+-Can admin log in after logging out?
+User Invite
+========
+-Can admin invite users with the same name?
+-Can admins invite users with the same email?
+-Does an invite link appear in user's emails?
+-Does a user who is invited and not present in database beforehand, see the tasks that they've been assigned to on sign-up?
+-Can admins invite multiple users on the same project?
+-Can admins invite the same user on different projects?
+-Can admins immediately assign tasks to an invited user?
+Task Creation
+========
+-Can admins create tasks without any field?
+-Are users notified upon being assigned on a task?
+-Can users create tasks without any field?
+-Are admins notified when users create a task?
+Task Update
+========
+-Are admins notified when users set a task to Done or Blocker?
+Task Deletion
+========
+-Are users notified when an admin deletes tasks?

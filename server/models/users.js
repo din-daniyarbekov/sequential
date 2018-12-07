@@ -5,7 +5,6 @@ const validator = require('validator')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 
-// We'll make this model in a different way
 const UserSchema = new mongoose.Schema({
     name: {
 		type: String,
@@ -65,7 +64,7 @@ UserSchema.methods.generateAuthToken = function () {
   };
 
 
-	
+
 UserSchema.methods.deleteToken = function (token) {
 	const user = this;
 	return user.update({
@@ -134,7 +133,7 @@ UserSchema.pre('save', function(next) {
 		next();
 	}
 
-})
+}) 
 
 
 const User = mongoose.model('User', UserSchema)
