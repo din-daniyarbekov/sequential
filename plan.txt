@@ -7,7 +7,7 @@ email: javednissar@gmail.com
 
 Basic User 1
 user name: tonymontana
-password:98765
+password:987656
 email: javed.nissar@mail.utoronto.ca
 
 Create Basic User 2
@@ -80,7 +80,8 @@ How did you increase the code complexity from the last phase?
 	Added chronological and priority level sorting when viewing all tasks
 
 What would you have done differently on this project?
-	not use monogodb, relational database would work better for this project's data
+	-not use monogodb, relational database would work better for this project's data
+	-we would have adhered closely to best practices for development with Vue as the front-end became quite unwieldy near the end
 
 What challenges did you encounter when working on this project?
 	getting frontend communicating correctly with the backend through fetch ajax call
