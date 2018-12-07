@@ -132,6 +132,12 @@ app.post('/registration',(req,res)=>{
       })
 });
 
+function makeInviteURL(){
+    if(process.env.PORT){
+        return "https://polar-ocean-74397.herokuapp.com/account-creation.html";
+    }
+    return "localhost:3000/index.html";
+}
 
 app.post('/admin/invite_user',authenticate,(req,res)=>{
     Projects.find({
@@ -164,8 +170,8 @@ app.post('/admin/invite_user',authenticate,(req,res)=>{
     requiredProject.save().then((docs) =>{
         data.to = req.body.email;
         data.subject = `Sequential: You're invited to ${req.body.projectName}`;
-        //add Heroku link here
-        data.text = `Please go`;
+        const inviteURL = makeInviteURL();
+        data.text = `Please go to ${inviteURL}`;
         mailgun.messages().send(data, function (error, body) {
             console.log(body);
         });  
