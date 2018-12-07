@@ -6,13 +6,13 @@ https://polar-ocean-74397.herokuapp.com/
 Login credentials: 
 Basic User:
 user name: tonymontana
-password:98765
+password:678910
 email:javed.nissar@mail.utoronto.ca
 
 
 Admin:
 user name: pabloescobar 
-password: 12345
+password: 123456
 email: javednissar@gmail.com
 
 

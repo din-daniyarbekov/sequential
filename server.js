@@ -323,7 +323,7 @@ app.post('/admin/create_task',authenticate, (req, res) =>{
                 }
                 project.tasks.push(task);
                 project.save().then((docs) => {
-                    data.to = task.email;
+                    data.to = task.assigneeEmail;
                     data.subject = 'Sequential: Task Assigned'
                     data.text = `You have a new task, ${req.body.text}`;
                     debugger;
@@ -613,6 +613,12 @@ app.patch('/user/update_task', authenticate, (req, res) => {
                                 projUser.email = email;
                             }
                           });
+
+                        project.tasks.forEach(task => {
+                            if(task.assigneeEmail === user.email){
+                                task.assigneeEmail = email;
+                            }
+                        });
 
         
                         project.save().then((projInfo) => {

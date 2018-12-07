@@ -182,9 +182,9 @@ const validateEmail = (email) => {
 }
 
 
-const foundUserFunction = function(emailToFind){
+const foundUserFunction = function(emailToFind, nameToFind){
     return function(user){
-        return user.email === emailToFind;
+        return user.email === emailToFind || user.name === nameToFind;
     }
 }
 

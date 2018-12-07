@@ -25,7 +25,7 @@ IV. Log-in with new Email and Password
 --------
 I. Go to /account_settings.html
 II. Write new Email and Password
-III. Apply Changes annd Log-out
+III. Apply Changes and Log-out
 IV. Log-in with new Email and Password
 V. Verify that Email changed in all associated tasks
 Log-in
