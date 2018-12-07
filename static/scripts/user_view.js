@@ -19,8 +19,6 @@ function createUserObject(id, name){
 	}
 }
 
-const john = createUserObject(1,'John')
-
 
 function createTaskObject(id, text, blocked, done, priority, dueDate){
 	return {
@@ -32,20 +30,15 @@ function createTaskObject(id, text, blocked, done, priority, dueDate){
 		dueDate: dueDate	}
 }
 
-const done_task = createTaskObject(1, "Get kitten", false, true, 0, yesterday, john);
-const blocked_task = createTaskObject(2, "Pass CSC373", true, false, 1, today, john);
-const task = createTaskObject(3, "Go to cat cafe", false, false, 2, withinNextWeek, john);
-const tasks = [done_task, blocked_task, task];
-
-function updateTask(task, successCallback){
+function updateTask(task, blocker, done, successCallback){
     request_body = {
 		taskId: task.id,
-        done: task.done,
-        blocker: task.blocked
+        done: done,
+        blocker: blocker
     }
-    taskUpdateRequest = new Request('/admin/update_task',{
-        method:'patch',
-        body: request_body,
+    taskUpdateRequest = new Request('/user/update_task',{
+        method:'PATCH',
+        body: JSON.stringify(request_body),
         headers:constantHeaders,
     });
     fetch(taskUpdateRequest).then((res) => {
@@ -136,24 +129,24 @@ const taskComponent = Vue.component('task',{
 		blockerMethod: function(event){
 			function makeSuccessCallback(task){
 				return function(blob){
-					this.task.blocked = !this.task.blocked;
-					if(this.task.blocked){
-						this.task.done = false;
+					task.blocked = !task.blocked;
+					if(task.blocked){
+						task.done = false;
 					}
 				}
 			}
-			updateTask(this.task,makeSuccessCallback(this.task));
+			updateTask(this.task,!this.task.blocked, this.task.done, makeSuccessCallback(this.task));
 		},
 		doneMethod: function(event){
 			function makeSuccessCallback(task){
 				return function(blob){
-					this.task.done = !this.task.done;
-					if(this.task.done){
-						this.task.blocked =false;
+					task.done = !task.done;
+					if(task.done){
+						task.blocked =false;
 					}
 				}
 			}
-			updateTask(this.task, makeSuccessCallback(this.task));
+			updateTask(this.task, this.task.blocked, !this.task.done, makeSuccessCallback(this.task));
 		}
 	}
 });
@@ -183,7 +176,8 @@ getTasksData = {
 	method: 'get',
 	headers: constantHeaders,
 }
-getTasksRequest = new Request("/user/get_tasks", getTasksData).then((res) => {
+getTasksRequest = new Request("/user/get_tasks", getTasksData)
+fetch(getTasksRequest).then((res) => {
 	if(res.status === 200){
 		return res.json();
 	}else{
@@ -193,10 +187,11 @@ getTasksRequest = new Request("/user/get_tasks", getTasksData).then((res) => {
 	tasks = [];
 	for(let json_task of json){
 		task = createTaskObject(json_task.id, 
+			json_task.text,
 			json_task.blocker, 
 			json_task.done, 
 			json_task.priority, 
-			json_task.dueDate);
+			new Date(json_task.dueDate));
 		tasks.push(task);
 	}
 	const app = new Vue({
@@ -232,10 +227,31 @@ getTasksRequest = new Request("/user/get_tasks", getTasksData).then((res) => {
 	
 				if(current <= dueDate){
 					if(this.newTaskText){
-						alert(`New Task Made With:(Name:${this.newTaskText},Due Date:${this.newDueDate.toString()},Priority:${this.newTaskPriority}`);
 						const newId = incrementMaxId(this.tasks);
 						const task = createTaskObject(newId,this.newTaskText,false, false, this.newTaskPriority, dueDate);
-						this.tasks.push(task);
+						requestBody = JSON.stringify({
+							taskId:newId,
+							text: this.newTaskText,
+							dueDate: dueDate,
+							priority: parseInt(this.newTaskPriority),
+						});
+						const createTaskRequest = new Request('/user/create_task', {
+							method:'POST',
+							headers: constantHeaders,
+							body: requestBody
+						});
+						tasks = this.tasks;
+						fetch(createTaskRequest).then(function(res){
+							if(res.status === 200){
+								return res.json();
+							}else{
+								alert("Task Creation Failed!");
+								throw new Error();
+							}
+						}).then(function(json){
+							alert(`New Task Made With:(Name:${this.newTaskText},Due Date:${this.newDueDate.toString()},Priority:${this.newTaskPriority}`);
+							tasks.push(task);
+						});
 					}else{
 						alert('Task name cannot be null');
 					}

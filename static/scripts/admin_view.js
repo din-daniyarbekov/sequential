@@ -98,30 +98,7 @@ function makeTaskFilter(taskToFilterBy){
     return (taskToFilter) => taskToFilter.id != taskToFilterBy.id;
 }
 
-function updateTask(task,project){
-    request_body = {
-        projectName: project.name,
-        assigneeEmail: task.assignee.email,
-        done: task.done,
-        blocker: task.blocked
-    }
-    taskUpdateRequest = new Request('/admin/update_task',{
-        method:'patch',
-        body: request_body,
-        headers:constantHeaders,
-    });
-    fetch(taskUpdateRequest).then((res) => {
-        if(res.status === 200){
-            return res.blob();
-        }else{
-            throw new Error(res.blob());
-        }
-    }).then((blob) => {
-        console.log("Task Updated!:" + blob);
-    }).catch((e) => {
-        alert("Task Update Failed");
-    })
-}
+
 
 /*when users press the "blocker" button, the data about this task being a blocker sent to the server and then the 
 admin who is overseeing the projects will be notified. Similar to done, after pressing done, the admin should be notified as well
@@ -138,7 +115,7 @@ const taskComponent = Vue.component('task',{
         }
     },
     template: `
-        <li class="list-group-item mt-1 border" v-bind:class="listClassObject">
+        <li class="list-group-item mt-1 border" >
             <div class="row">
                 <div class="col-8">
                     <div class="row h-50 ml-1">
@@ -178,7 +155,7 @@ const taskComponent = Vue.component('task',{
             }
             const taskDeleteRequest = new Request('/admin/delete_task', {
                 method: 'delete',
-                body: requestData,
+                body: JSON.stringify(requestData),
                 headers: constantHeaders
             })
             fetch(taskDeleteRequest).then((response) => {
@@ -251,7 +228,7 @@ fetch(request).then(function(res){
                 json_task.blocker, 
                 json_task.done, 
                 json_task.priority, 
-                json_task.dueDate, 
+                new Date(json_task.dueDate), 
                 users.find(findUserFunc));
             tasks.push(task);
         }
@@ -293,10 +270,12 @@ fetch(request).then(function(res){
                             }),
                             headers: constantHeaders
                         });
+                        const inviteUserEmail = this.inviteUserEmail;
+                        const inviteUserName = this.inviteUserName;
                         fetch(inviteUserRequest).then(function(response){
                             if(response.status === 200){
                                 alert("New user invited!");
-                                const newUser = createUserObject(newUserId, this.inviteUserName, this.inviteUserEmail);
+                                const newUser = createUserObject(newUserId, inviteUserName, inviteUserEmail);
                                 project.users.push(newUser);
                             }else{
                                 alert("User invite failed!");
@@ -335,17 +314,24 @@ fetch(request).then(function(res){
                                 body: JSON.stringify({
                                     projectName:project.name,
                                     email:this.newTaskUserEmail,
+                                    text: this.newTaskText,
                                     taskId:newId,
                                     dueDate: dueDate,
-                                    priority: priority,
+                                    priority: this.newTaskPriority
                                 }),
                                 headers: constantHeaders
                             });
+                            const taskText = this.newTaskText;
+                            const taskPriority = this.newTaskPriority;
+                            const taskDueDate = this.newDueDate;
+                            const taskUserEmail = this.newTaskUserEmail;
                             fetch(createTaskRequest).then(function(response){
                                 if(response.status === 200){
-                                    alert(`New Task Made With:(Name:${this.newTaskText},Due Date:${this.newDueDate.toString()},Assignee:${this.newTaskUserEmail}),Priority:${this.newTaskPriority}`);
-                                    const task = createTaskObject(newId,this.newTaskText,false, false, this.newTaskPriority, dueDate, foundUser);
+                                    alert(`New Task Made With:(Name:${taskText},Due Date:${taskDueDate.toString()},Assignee:${taskUserEmail}),Priority:${taskPriority}`);
+                                    const task = createTaskObject(newId, taskText, false, false, taskPriority, dueDate, foundUser);
                                     project.tasks.push(task); 
+                                }else if(response.status === 404){
+                                    alert("Your assignee hasn't registered!");
                                 }else{
                                     alert("No Task Made");
                                 }

@@ -156,12 +156,12 @@ app.post('/admin/invite_user',authenticate,(req,res)=>{
 
     }
     requiredProject.save().then((docs) =>{
-        //not sure which link should it be
-        data.to = user.name;
-        data.subject = `Sequential: You're invited`
-            data.text = `Please go`;
-            mailgun.messages().send(data, function (error, body) {
-        console.log(body);
+        data.to = req.body.email;
+        data.subject = `Sequential: You're invited to ${req.body.projectName}`;
+        //add Heroku link here
+        data.text = `Please go`;
+        mailgun.messages().send(data, function (error, body) {
+            console.log(body);
         });  
 
         res.send(docs);
@@ -296,38 +296,38 @@ app.post('/admin/create_task',authenticate, (req, res) =>{
         User.findOne({
             email: req.body.email
         }).then((user) => {
-            try{
-            
-            var task;
-           
-            task = {
-                id: parseInt(req.body.taskId),
-                text: req.body.text,
-                dueDate: new Date(req.body.dueDate),
-                priority: parseInt(req.body.priority),
-                assignee: user._id,
-                assigneeEmail: req.body.email
+            if(user === undefined){
+                res.status(404).send("Could not find user");
+                return;
             }
-            project.tasks.push(task);
-       
-            project.save().then((docs) => {
-
-                data.to = task.email;
-                data.subject = 'Sequential: Task Assigned'
-                data.text = `You have a new task, ${req.body.text}`;
-                mailgun.messages().send(data, function (error, body) {
-                    console.log(body);
-                  }, (e)=>{
-                      console.log(e)
-                  });
-                res.send({docs});
-            }, (e) => {
-                console.log(e);
-                res.status(400).send(e);
-            })
-        } catch(e){
-            return res.status(400).send(e);
-        }
+            try{
+                let task = {
+                    id: parseInt(req.body.taskId),
+                    text: req.body.text,
+                    dueDate: new Date(req.body.dueDate),
+                    priority: parseInt(req.body.priority),
+                    assignee: user._id,
+                    assigneeEmail: req.body.email
+                }
+                project.tasks.push(task);
+                project.save().then((docs) => {
+                    data.to = task.email;
+                    data.subject = 'Sequential: Task Assigned'
+                    data.text = `You have a new task, ${req.body.text}`;
+                    debugger;
+                    mailgun.messages().send(data, function (error, body) {
+                        console.log("Task Email Sent");
+                    }, (e)=>{
+                        console.log(e);
+                    });
+                    res.send(docs);
+                }, (e) => {
+                    console.log(e);
+                    res.status(400).send(e);
+                });
+            } catch(e){
+                return res.status(400).send(e);
+            }
         }, (e) => {
             console.log(e);
             res.status(400).send(e);
@@ -461,21 +461,19 @@ app.patch('/user/update_task', authenticate, (req, res) => {
         Projects.findOne({
             'projectUsers.email': user.email
         }).then((project) => {
-            console.log(project);
 
                 const done = req.body.done;
                 const blocker = req.body.blocker;
                 try{
-                    project.tasks.forEach(task => {
-                        if(task.id == req.body.taskId){
-                            task.blocker = blocker;
-                            task.done = done;
-                        }
+
+                    const taskIndex = project.tasks.findIndex(task =>{
+                        return task.id === req.body.taskId;
                     });
-                
-                const task = project.tasks.find(task =>{
-                        return task.id == req.body.taskId;
-                })
+                    project.tasks[taskIndex].blocker = blocker;
+                    project.tasks[taskIndex].done = done;
+                    debugger;
+                    const task = project.tasks[taskIndex];
+
 
 
 
@@ -486,9 +484,12 @@ app.patch('/user/update_task', authenticate, (req, res) => {
                         if(done){
                             data.subject = 'Sequential: Task Done';
                             data.text = `The following task is done: ${task.text}`;
-                        }else{
+                        }else if(blocker){
                             data.subject = 'Sequential: Task Blocked';
                             data.text = `The following task is blocked: ${task.text}`;
+                        }else{
+                            data.subject = 'Sequential: Task is no longer Done or Blocked';
+                            data.text = `The following task is no longer done or blocked: ${task.text}`;
                         }
                         mailgun.messages().send(data, function (error, body) {
                             if(error){
@@ -498,13 +499,13 @@ app.patch('/user/update_task', authenticate, (req, res) => {
                             }
                           });
                         res.send(docs); 
-                    })
+                    });
                 } , (e) => {
-                    console.log("error");
+                    console.log("error",e);
                     res.status(400).send(e);
                 })
             }catch(e){
-                    console.log("error");
+                    console.log("error",e);
                     return res.status(400).send(e);
             } 
             }, (e) => {
