@@ -1,4 +1,7 @@
+Please note that we received a 1 day extension from Professor Kazakevich as stated in a previous email
+
 Our project can be accessed with this link:
+https://polar-ocean-74397.herokuapp.com/
 
 Login credentials: 
 Basic User:
