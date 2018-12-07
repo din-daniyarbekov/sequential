@@ -104,7 +104,7 @@ let authenticate = (req, res, next) => {
 
 
 app.delete('/users/logout',authenticate,(req,res)=>{
-    req.user.removeToken(req.token).then(()=>{
+    req.user.deleteToken(req.token).then(()=>{
         res.status(200).send();
     },()=>{
         res.status(400).send();

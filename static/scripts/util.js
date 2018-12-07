@@ -58,3 +58,22 @@ const constantHeaders = {
     'Content-Type': 'application/json',
     'x-auth':sessionStorage.getItem('token')
 } 
+
+const logoutLink = document.querySelector('#logout');
+logoutLink.addEventListener('click', function(evt){
+    evt.preventDefault();
+    const logoutRequest = new Request('/users/logout', {
+        method:'DELETE',
+        headers: constantHeaders
+    });
+    fetch(logoutRequest).then((res) => {
+        if(res.status === 200){
+            window.location = '/index.html';
+        }else{
+            alert("Logout failed!");
+        }
+    }).catch((error) => {
+        console.log(error);
+        alert("Error occured while logging out");
+    })
+})
