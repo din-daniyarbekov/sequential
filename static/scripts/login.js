@@ -32,7 +32,7 @@ function passwordCheck(e){
                         return res.json();
                     } else {
                         window.alert('Error, incorrect log in information');
-                        return;
+                        throw new Error();
                     }
                 }).then(function(json){
                     sessionStorage.setItem("token", json.token);

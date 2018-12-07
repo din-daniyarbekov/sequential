@@ -76,11 +76,16 @@ app.route('/login')
 app.post('/users/login', (req, res) => {
         const email = req.body.email
         const password = req.body.password
-    
+        let userToUse = null;
         User.findByEmailPassword(email, password).then((user) => {
-                res.send({token:user.tokens[0].token, isAdmin: user.isAdmin});
+            userToUse = user;
+            return user.generateAuthToken();
+        }).then((token) => {
+            debugger;
+            res.send({token:token, isAdmin: userToUse.isAdmin});
         }).catch((error) => {
-            res.status(400).send()
+            debugger;
+            res.status(400).send(error);
         })
     })
 
@@ -118,8 +123,8 @@ app.post('/registration',(req,res)=>{
 
     user.save().then(() => {
         return user.generateAuthToken();
-      }).then((token) => {
-        res.header('x-auth', token).send(user);
+      }).then((result) => {
+        res.header('x-auth', result.token).send(user);
       }).catch((e) => {
         
         res.status(400).send(e);
