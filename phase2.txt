@@ -2,59 +2,70 @@ Our project can be accessed with this link:
 
 Login credentials: 
 Basic User:
+user name: tonymontana
+password:98765
+email:javed.nissar@mail.utoronto.ca
+
+
 Admin:
+user name: pabloescobar 
+password: 12345
+email: javednissar@gmail.com
+
 
 A new account can also be created by clicking "create a new profile" on the login page 
 
 Changes we have made since the previous phase include:
-adding a task search feature
-changing the interface to use modal pop up windows for information entry, which can be dismissed by pressing esc
-added a time indicator to each task, displaying how much time is left before it is due
-added email notifications for multiple features:
-  - if a change is made to a tasks blocked or done indicators, an email is sent to the admin of that project
-  - if a user creates a task for themselves the admin for that project is emailed
-  - if an admin creates a task for a specific user, that user is emailed
-  - the email also offers a link for user to register if they have not already done so 
+  adding a task search feature
+  changing the interface to use modal pop up windows for information entry, which can be dismissed by pressing esc
+  added a time indicator to each task, displaying how much time is left before it is due
+  added email notifications for multiple features:
+    - if a change is made to a tasks blocked or done indicators, an email is sent to the admin of that project
+    - if a user creates a task for themselves the admin for that project is emailed
+    - if an admin creates a task for a specific user, that user is emailed
+    - email also offers a link for user to register if they do not have an account on the website
 
 Differences from original project proposal include:
-removed the project_creation.html to limit the number of unnecessary views, replacing it with a modal pop up
-limited the amount of users assigned to a task to 1 (there still can be any number of users associated with a project)
-limited the number of admins assigned to project to 1
-tasks do not have an estimated time to complete
-admins do not have to authorize admin actions by re-entering their password
-admins cannot change other users profile settings
-admins cannot change any task to be done or blocked, only people assigned to the task can modify their status
+  removed the project_creation.html to limit the number of unnecessary views, replacing it with a modal pop up
+  limited the amount of users assigned to a task to 1 (there still can be any number of users associated with a project)
+  limited the number of admins assigned to project to 1
+  tasks do not have an estimated time to complete
+  admins do not have to authorize admin actions by re-entering their password
+  admins cannot change other users profile settings
+  admins cannot assign tasks to themselves
+  admins cannot change any task to be done or blocked, only people assigned to the task can modify their status
+  
 
 Basic User Features:
-Viewing tasks sorted by completed, blocked, and all - clicking the buttons labeled as such at the top of the list of tasks
-Search for a specific task - entering the name of a task in the search bar at the top of the list of tasks
-Change password and email account - clicking "user settings" in the top bar and entering new password and email information
-Create a task  for yourself - clicking the "Create a task" button and entering the task name, due date, priority in a pop up modal
-(the user that creates a task will trigger a email notification which is sent to the admin of that project) 
-Mark tasks as complete or blocked - clicking the done or blocker buttons located in the task box, clicking the done or blocker button again will remove the complete or blocked flag.
-(email will be sent to the admin of the project)
+  Viewing tasks sorted by completed, blocked, and all - clicking the buttons labeled as such at the top of the list of tasks
+  Search for a specific task - entering the name of a task in the search bar at the top of the list of tasks
+  Change password and email account - clicking "user settings" in the top bar and entering new password and email information
+  Create a task  for yourself - clicking the "Create a task" button and entering the task name, due date, priority in a pop up modal
+  (the user that creates a task will trigger a email notification which is sent to the admin of that project) 
+  Mark tasks as complete or blocked - clicking the done or blocker buttons located in the task box, clicking the done or blocker button again will remove the complete or blocked flag.
+  (email will be sent to the admin of the project)
 
 Admin Features: (includes all basic user features)
-Create a project - clicking the "Create New Project" button at the top of the list of projects and entering the project name, due date, priority and project assignee
-Invite user to project - clicking the "Invite a user" button and entering the user name and associated email
-Assign task to other user - when creating a new task, admins have the option of assigning the task to any other user
-(an email notification will be sent to the user)
-Delete task within a project - clicking the "delete" button associated with a task will permanently remove it from the project and the database 
+  Create a project - clicking the "Create New Project" button at the top of the list of projects and entering the project name, due date, priority and project assignee
+  Invite user to project - clicking the "Invite a user" button and entering the user name and associated email
+  Assign task to other user - when creating a new task, admins have the option of assigning the task to any other user
+  (an email notification will be sent to the user)
+  Delete task within a project - clicking the "delete" button associated with a task will permanently remove it from the project and the database 
 
 Basic use walkthrough
 Admin:
-1. Login to site
-2. Create new project(s)
-3. Invite users to the project(s)
-4. Create new tasks and assign users to them
-5. Manage the tasks that are assigned to you with done and blocker markers
-6. Delete tasks once you and other users have marked them as done
+  1. Login to site
+  2. Create new project(s)
+  3. Invite users to the project(s)
+  4. Create new tasks and assign users to them
+  5. Manage the tasks that are assigned to you with done and blocker markers
+  6. Delete tasks once you and other users have marked them as done
 
 Basic User:
-1. Login to site
-2. Wait until you recieve notification that you have been invited to a project by an admin
-3. Create new tasks that will be assigned to you 
-4. Manage your tasks assigned to you with done and blocker markers 
+  1. Login to site
+  2. Wait until you recieve notification that you have been invited to a project by an admin
+  3. Create new tasks that will be assigned to you 
+  4. Manage your tasks assigned to you with done and blocker markers 
 
 Routes Overview:
 
