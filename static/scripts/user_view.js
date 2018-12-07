@@ -19,8 +19,6 @@ function createUserObject(id, name){
 	}
 }
 
-const john = createUserObject(1,'John')
-
 
 function createTaskObject(id, text, blocked, done, priority, dueDate){
 	return {
@@ -32,10 +30,27 @@ function createTaskObject(id, text, blocked, done, priority, dueDate){
 		dueDate: dueDate	}
 }
 
-const done_task = createTaskObject(1, "Get kitten", false, true, 0, yesterday, john);
-const blocked_task = createTaskObject(2, "Pass CSC373", true, false, 1, today, john);
-const task = createTaskObject(3, "Go to cat cafe", false, false, 2, withinNextWeek, john);
-const tasks = [done_task, blocked_task, task];
+function updateTask(task, blocker, done, successCallback){
+    request_body = {
+		taskId: task.id,
+        done: done,
+        blocker: blocker
+    }
+    taskUpdateRequest = new Request('/user/update_task',{
+        method:'PATCH',
+        body: JSON.stringify(request_body),
+        headers:constantHeaders,
+    });
+    fetch(taskUpdateRequest).then((res) => {
+        if(res.status === 200){
+            return res.blob();
+        }else{
+            throw new Error(res.blob());
+        }
+    }).then(successCallback).catch((e) => {
+        alert("Task Update Failed");
+    });
+}
 
 /*
  * End of server-side interaction code
@@ -112,26 +127,26 @@ const taskComponent = Vue.component('task',{
 	`,
 	methods:{
 		blockerMethod: function(event){
-			this.task.blocked = !this.task.blocked;
-			if(this.task.blocked){
-				this.task.done = false;
-				/*this.project.completedTasks = this.project.completedTasks.filter(makeTaskFilter(this.task));
-				this.project.blockedTasks.push(this.task);
-				*/
-			}else{
-				/*this.project.blockedTasks = this.project.blockedTasks.filter(makeTaskFilter(this.task)); */
+			function makeSuccessCallback(task){
+				return function(blob){
+					task.blocked = !task.blocked;
+					if(task.blocked){
+						task.done = false;
+					}
+				}
 			}
+			updateTask(this.task,!this.task.blocked, this.task.done, makeSuccessCallback(this.task));
 		},
 		doneMethod: function(event){
-			this.task.done = !this.task.done;
-			if(this.task.done){
-				this.task.blocked =false;
-				/*this.project.blockedTasks = this.project.blockedTasks.filter(makeTaskFilter(this.task));
-				this.project.completedTasks.push(this.task);
-				*/
-			}else{
-				/*this.project.completedTasks = this.project.completedTasks.filter(makeTaskFilter(this.task));*/
+			function makeSuccessCallback(task){
+				return function(blob){
+					task.done = !task.done;
+					if(task.done){
+						task.blocked =false;
+					}
+				}
 			}
+			updateTask(this.task, this.task.blocked, !this.task.done, makeSuccessCallback(this.task));
 		}
 	}
 });
@@ -157,54 +172,99 @@ function constructFilterFunc(search, propertyFilter){
 	}
 }
 
-const app = new Vue({
-	el: '#app',
-	data: {
-		tasks:[done_task, blocked_task, task],
-		display:0,
-		newTaskPriority:0,
-		newTaskText:"",
-		newDueDate:new Date(),
-		search:""
-	},
-	computed:{
-		searchedTasks:function(){
-			return this.tasks.filter(constructFilterFunc(this.search, 0)).sort(sort_task_func);
+getTasksData = {
+	method: 'get',
+	headers: constantHeaders,
+}
+getTasksRequest = new Request("/user/get_tasks", getTasksData)
+fetch(getTasksRequest).then((res) => {
+	if(res.status === 200){
+		return res.json();
+	}else{
+		throw new Error(res.json());
+	}
+}).then((json) => {
+	tasks = [];
+	for(let json_task of json){
+		task = createTaskObject(json_task.id, 
+			json_task.text,
+			json_task.blocker, 
+			json_task.done, 
+			json_task.priority, 
+			new Date(json_task.dueDate));
+		tasks.push(task);
+	}
+	const app = new Vue({
+		el: '#app',
+		data: {
+			tasks: tasks,
+			display:0,
+			newTaskPriority:0,
+			newTaskText:"",
+			newDueDate:new Date(),
+			search:""
 		},
-		completedTasks: function(){
-			return this.tasks.filter(constructFilterFunc(this.search, 1)).sort(sort_task_func);
+		computed:{
+			searchedTasks:function(){
+				return this.tasks.filter(constructFilterFunc(this.search, 0)).sort(sort_task_func);
+			},
+			completedTasks: function(){
+				return this.tasks.filter(constructFilterFunc(this.search, 1)).sort(sort_task_func);
+			},
+			blockedTasks: function() {
+				return this.tasks.filter(constructFilterFunc(this.search, 2)).sort(sort_task_func);
+			}
 		},
-		blockedTasks: function() {
-			return this.tasks.filter(constructFilterFunc(this.search, 2)).sort(sort_task_func);
+		components:{
+			task:taskComponent
+		},
+		 methods:{
+			 createTask: function(){
+				// assume tasks are due at 11:59 pm on their due date
+				current = new Date();
+				dueDate = new Date(this.newDueDate);
+				dueDate.setDate(dueDate.getDate()+1);
+	
+				if(current <= dueDate){
+					if(this.newTaskText){
+						const newId = incrementMaxId(this.tasks);
+						const task = createTaskObject(newId,this.newTaskText,false, false, this.newTaskPriority, dueDate);
+						requestBody = JSON.stringify({
+							taskId:newId,
+							text: this.newTaskText,
+							dueDate: dueDate,
+							priority: parseInt(this.newTaskPriority),
+						});
+						const createTaskRequest = new Request('/user/create_task', {
+							method:'POST',
+							headers: constantHeaders,
+							body: requestBody
+						});
+						tasks = this.tasks;
+						fetch(createTaskRequest).then(function(res){
+							if(res.status === 200){
+								return res.json();
+							}else{
+								alert("Task Creation Failed!");
+								throw new Error();
+							}
+						}).then(function(json){
+							alert(`New Task Made With:(Name:${this.newTaskText},Due Date:${this.newDueDate.toString()},Priority:${this.newTaskPriority}`);
+							tasks.push(task);
+						});
+					}else{
+						alert('Task name cannot be null');
+					}
+				} else{
+					alert('Assigned due date cannot have already passed');
+				}
+	
+			 }
 		}
-	},
-	components:{
-		task:taskComponent
-	},
- 	methods:{
- 		createTask: function(){
-
-            // assume tasks are due at 11:59 pm on their due date
-
-            current = new Date();
-            dueDate = new Date(this.newDueDate);
-            dueDate.setDate(dueDate.getDate()+1);
-
-	        if(current <= dueDate){
-	        	if(this.newTaskText){
-		            alert(`New Task Made With:(Name:${this.newTaskText},Due Date:${this.newDueDate.toString()},Priority:${this.newTaskPriority}`);
-		            const newId = incrementMaxId(this.tasks);
-		            const task = createTaskObject(newId,this.newTaskText,false, false, this.newTaskPriority, dueDate);
-		            this.tasks.push(task);
-		        }else{
-		        	alert('Task name cannot be null');
-		        }
-	        } else{
-	            alert('Assigned due date cannot have already passed');
-	        }
-
- 		}
- 	}
-
+	});
+}).catch((e) => {
+	alert("Getting tasks failed!");
+	console.log(e);
 });
+
 

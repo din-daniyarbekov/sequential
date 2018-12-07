@@ -29,19 +29,18 @@ function passwordCheck(e){
                 fetch(request)
                 .then(function(res) {
                     if (res.status === 200) {
-                        window.alert('Successful log in')
-                        sessionStorage.setItem("token", res.tokens[1])
-
-                        // if(res.isAdmin){
-                        //     window.location = '../admin_view.html';
-                        // } else {
-                        //     window.location = '../user_view.html';
-                        // }
+                        return res.json();
                     } else {
-                        window.alert(res.status, res.body)
-                        window.alert('Error, incorrect log in information')
+                        window.alert('Error, incorrect log in information');
+                        throw new Error();
                     }
-                    alert(res.body)
+                }).then(function(json){
+                    sessionStorage.setItem("token", json.token);
+                    if(json.isAdmin){
+                        window.location = "/admin_view.html";
+                    }else{
+                        window.location = "/user_view.html";
+                    }
                 }).catch((error) => {
                     alert(error)
                 })

@@ -13,7 +13,7 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav mr-auto">
                 <li class="nav-item">
-                    <a class="nav-link" href="index.html">Logout</a>
+                    <a class="nav-link" id="logout" >Logout</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="account_settings.html">User Settings</a>
@@ -80,8 +80,8 @@
                     <task v-for="task in searchAndSortTaskList(project.blockedTasks)" v-bind:task="task" v-bind:key="task.id" v-bind:project="project"></task>
                 </ul>
                 <!-- Invite a user to the project by typing his email address. Once user register, users info with the assigned project will be saved to the database.   -->
-                <button class="btn btn-primary mt-3" data-toggle="modal" :data-target="`#inviteUserModal${project.name}`">Invite a user!</button>
-                <div class="modal fade" :id="`inviteUserModal${project.name}`" tabindex="-1" role="dialog" :aria-labelledby="`inviteUserModal`" aria-hidden="true">
+                <button class="btn btn-primary mt-3" data-toggle="modal" :data-target="`#inviteUserModal${removeWhitespace(project.name)}`">Invite a user!</button>
+                <div class="modal fade" :id="`inviteUserModal${removeWhitespace(project.name)}`" tabindex="-1" role="dialog" :aria-labelledby="`inviteUserModal`" aria-hidden="true">
                     <div class="modal-dialog" role="document">
                         <div class="modal-content">
                             <div class="modal-header">
@@ -101,8 +101,8 @@
                         </div>
                     </div>
                 </div>
-               <button class="btn btn-primary mt-3" data-toggle="modal" :data-target="`#createTaskModal${project.name}`">Create a task</button>
-                <div class="modal fade" :id="`createTaskModal${project.name}`" tabindex="-1" role="dialog" :aria-labelledby="`createTaskModal${project.name}`" aria-hidden="true">
+               <button class="btn btn-primary mt-3" data-toggle="modal" :data-target="`#createTaskModal${removeWhitespace(project.name)}`">Create a task</button>
+                <div class="modal fade" :id="`createTaskModal${removeWhitespace(project.name)}`" tabindex="-1" role="dialog" :aria-labelledby="`createTaskModal${project.name}`" aria-hidden="true">
                     <div class="modal-dialog" role="document">
                         <div class="modal-content">
                             <div class="modal-header">

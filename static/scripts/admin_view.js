@@ -60,8 +60,6 @@ function createUserObject(id, name, email){
     }
 }
 
-const john = createUserObject(1,'John',"johngreen@gmail.com")
-const dave = createUserObject(2,'Dave',"davegreen@gmail.com")
 
 function createTaskObject(id, text, blocked, done, priority, dueDate, assignee){
     return {
@@ -76,12 +74,6 @@ function createTaskObject(id, text, blocked, done, priority, dueDate, assignee){
 }
 
 
-const done_task = createTaskObject(1, "Get kitten", false, true, 0, working_date, john);
-const blocked_task = createTaskObject(2, "Pass CSC373", true, false, 1, yesterday, dave);
-const task = createTaskObject(3, "Go to cat cafe", false, false, 2, withinNextWeek, john);
-const done_dog_task = createTaskObject(4, "Get puppy", false, true, 0, withinNextMonth, dave);
-const dog_task = createTaskObject(5, "Go to dog cafe", false, false, 2, withinNextYear, dave);
-const tasks = [done_task, blocked_task, task];
 /*
 End of where we would normally include server-side interaction
  */
@@ -101,12 +93,12 @@ function createProjectObject(name, display, tasks, users){
     }
 }
 
-const project = createProjectObject("Cats", 0, tasks, [john, dave]);
-const second_project = createProjectObject("Dogs",0,[done_dog_task, dog_task],[john,dave]);
 
 function makeTaskFilter(taskToFilterBy){
     return (taskToFilter) => taskToFilter.id != taskToFilterBy.id;
 }
+
+
 
 /*when users press the "blocker" button, the data about this task being a blocker sent to the server and then the 
 admin who is overseeing the projects will be notified. Similar to done, after pressing done, the admin should be notified as well
@@ -117,36 +109,13 @@ When the task deadline is expired, tasks that havent been done will change statu
 the data will be sent to the server to add the empty project to the admins list*/
 const taskComponent = Vue.component('task',{
     props: ['task','project'],
-    data: function(){
-        return{
-            blockedStyle: false,
-            doneStyle:false
-        }
-    },
     computed: {
-        listClassObject: function(){
-            return {
-                'border-secondary': !this.task.done && !this.task.blocked,
-                'border-success': this.task.done,
-                'border-danger': this.task.blocked
-            }
-        },
-        blockerButtonClassObject:function(){
-            return {
-                'blocked': this.task.blocked
-            }
-        },
-        doneButtonClassObject:function(){
-            return {
-                'done': this.task.done
-            }
-        },
         relativeTime:function(){
             return relativeTimeOfTask(this.task);
         }
     },
     template: `
-        <li class="list-group-item mt-1 border" v-bind:class="listClassObject">
+        <li class="list-group-item mt-1 border" >
             <div class="row">
                 <div class="col-8">
                     <div class="row h-50 ml-1">
@@ -158,12 +127,6 @@ const taskComponent = Vue.component('task',{
                         </div>
                         <div>
                             <div class="btn-group btn-group-sm mb-2" role="group" aria-label="Status Buttons" >
-                                <button v-on:click="blockerMethod" class="btn btn-outline-dark" v-bind:class="blockerButtonClassObject">
-                                    Blocker
-                                </button>
-                                <button v-on:click="doneMethod" v-bind:class="doneButtonClassObject" class="btn btn-outline-dark">
-                                    Done
-                                </button>
                                 <button class="btn btn-outline-dark" v-on:click="deleteMethod">
                                     Delete
                                 </button>
@@ -185,30 +148,29 @@ const taskComponent = Vue.component('task',{
         </li>
     `,
     methods:{
-        blockerMethod: function(event){
-            this.task.blocked = !this.task.blocked;
-            if(this.task.blocked){
-                this.task.done = false;
-                this.project.completedTasks = this.project.completedTasks.filter(makeTaskFilter(this.task));
-                this.project.blockedTasks.push(this.task);
-            }else{
-                this.project.blockedTasks = this.project.blockedTasks.filter(makeTaskFilter(this.task));
-            }
-        },
-        doneMethod: function(event){
-            this.task.done = !this.task.done;
-            if(this.task.done){
-                this.task.blocked =false;
-                this.project.blockedTasks = this.project.blockedTasks.filter(makeTaskFilter(this.task));
-                this.project.completedTasks.push(this.task);
-            }else{
-                this.project.completedTasks = this.project.completedTasks.filter(makeTaskFilter(this.task));
-            }
-        },
         deleteMethod: function(event){
-            this.project.tasks = this.project.tasks.filter(makeTaskFilter(this.task));
-            this.project.blockedTasks = this.project.blockedTasks.filter(makeTaskFilter(this.task));
-            this.project.completedTasks = this.project.completedTasks.filter(makeTaskFilter(this.task));
+            requestData = {
+                projectName: this.project.name,
+                taskId: this.task.id
+            }
+            const taskDeleteRequest = new Request('/admin/delete_task', {
+                method: 'delete',
+                body: JSON.stringify(requestData),
+                headers: constantHeaders
+            })
+            fetch(taskDeleteRequest).then((response) => {
+                if(response.status === 200){
+                    this.project.tasks = this.project.tasks.filter(makeTaskFilter(this.task));
+                    this.project.blockedTasks = this.project.blockedTasks.filter(makeTaskFilter(this.task));
+                    this.project.completedTasks = this.project.completedTasks.filter(makeTaskFilter(this.task));
+                    return response.json();
+                }else{
+                    throw new Error(response.blob());
+                }
+            }).catch((error) => {
+                alert("Task Delete Failed");
+                console.log(error);
+            });
         }
     }
 });
@@ -225,101 +187,217 @@ const foundUserFunction = function(emailToFind){
         return user.email === emailToFind;
     }
 }
-const app = new Vue({
-    el: '#app',
-    data: {
-        projects:[project,second_project],
-        inviteUserEmail:"",
-        newTaskText:"",
-        newTaskUserEmail:"",
-        newTaskPriority:0,
-        newDueDate:new Date(),
-        inviteUserName:"",
-        search:"",
-        newProjectText:"",
-    },
-    components:{
-        task: taskComponent
-    },
-    methods:{
 
-        inviteUser:function(project){
-            const foundUser = project.users.find(foundUserFunction(this.inviteUserEmail));
-            if(this.inviteUserName){
-                if(validateEmail(this.inviteUserEmail) && foundUser === undefined){
-                    let newUserId = 1;
-                    if(project.users.length > 0){
-                        newUserId = incrementMaxId(project.users);
-                    }
-                    const newUser = createUserObject(newUserId, this.inviteUserName, this.inviteUserEmail);
-                    project.users.push(newUser);
-                    alert(`Email provided:${this.inviteUserEmail}`);
-                }else if(!validateEmail(this.inviteUserEmail)){
-                    alert('Email is invalid');
-                }else{
-                    alert('Duplicate user found');
-                }        
-            } else {
-                alert('The user name cannot be null');
-                }
-        },
 
-        createTask: function(project){
 
-            // assume tasks are due at 11:59 pm on their due date
 
-            current = new Date()
-            dueDate = new Date(this.newDueDate);
-            dueDate.setDate(dueDate.getDate()+1);
-
-            if(current <= dueDate){
-                if(this.newTaskText){
-                    if(this.newTaskUserEmail){
-                        alert(`New Task Made With:(Name:${this.newTaskText},Due Date:${this.newDueDate.toString()},Assignee:${this.newTaskUserEmail}),Priority:${this.newTaskPriority}`);
-                        let newId = 1;
-                        if(project.tasks.length > 0){
-                            newId = incrementMaxId(project.tasks);
-                        }   
-                        const foundUser = project.users.find(foundUserFunction(this.newTaskUserEmail));
-                        const task = createTaskObject(newId,this.newTaskText,false, false, this.newTaskPriority, dueDate, foundUser);
-                        project.tasks.push(task); 
-                    }else{
-                        alert('A person must be assigned to a new task!');
-                    }
-                }else{
-                    alert('Task name cannot be null');
-                }
-            }else{
-                alert('Assigned due date cannot have already passed');
-            }
-        },
-
-        createProject:function(){
-            
-            if (this.newProjectText){
-                alert(`New Project called: ${this.newProjectText} created`); 
-                const newProject = createProjectObject(this.newProjectText, 0, [], []);
-                this.projects.push(newProject);
-            }else{
-                alert('Project name cannot be null')
-            }
-        },
-
-        searchAndSortTaskList: function(taskList){
-            const search_func = function(search_str){
-                return function(task){
-                    return task.text.toLowerCase().includes(search_str.toLowerCase());
-                }
-            }
-            
-            if(this.search === ""){
-                return taskList.slice(0).sort(sort_task_func);
-            }else{
-                return taskList.filter(search_func(this.search)).sort(sort_task_func);
-            }         
-        }
-    }
+const request = new Request('admin/get_projects', {
+    method: 'get', 
+    headers: constantHeaders
 });
 
+fetch(request).then(function(res){
+    if (res.status === 200) {
+        return res.json();
+    } else {
+        window.alert('Error, incorrect log in information');
+        throw new Error(res.json());
+    }
+}).then(function(json){
+    let projects = [];
+    for(const json_project of json){
+        const json_tasks = json_project.tasks;
+        const json_users = json_project.projectUsers;
+        tasks = [];
+        users = [];
+        let userCount = 0;
+        for(const json_user of json_users){
+            const user = createUserObject(userCount, json_user.name, json_user.email);
+            users.push(user);
+            userCount++;
+        }
+        function makeFindUserFunc(userEmail){
+            return (user) => {
+                return user.email === userEmail;
+            }
+        }
+        for(const json_task of json_tasks){
+            findUserFunc = makeFindUserFunc(json_task.assigneeEmail);
+            task = createTaskObject(json_task.id, 
+                json_task.text, 
+                json_task.blocker, 
+                json_task.done, 
+                json_task.priority, 
+                new Date(json_task.dueDate), 
+                users.find(findUserFunc));
+            tasks.push(task);
+        }
+        projects.push(createProjectObject(json_project.name,0,tasks, users));
+    }
 
-
+    const app = new Vue({
+        el: '#app',
+        data: {
+            projects:projects,
+            inviteUserEmail:"",
+            newTaskText:"",
+            newTaskUserEmail:"",
+            newTaskPriority:0,
+            newDueDate:new Date(),
+            inviteUserName:"",
+            search:"",
+            newProjectText:"",
+        },
+        components:{
+            task: taskComponent
+        },
+        methods:{
+            removeWhitespace: function(text){
+                return text.split(' ').join('');
+            },
+            inviteUser:function(project){
+                const foundUser = project.users.find(foundUserFunction(this.inviteUserEmail));
+                if(this.inviteUserName){
+                    if(validateEmail(this.inviteUserEmail) && foundUser === undefined){
+                        let newUserId = 1;
+                        if(project.users.length > 0){
+                            newUserId = incrementMaxId(project.users);
+                        }
+                        const inviteUserRequest = new Request("/admin/invite_user",{
+                            method:"post",
+                            body: JSON.stringify({
+                                name: this.inviteUserName,
+                                email: this.inviteUserEmail,
+                                projectName: project.name
+                            }),
+                            headers: constantHeaders
+                        });
+                        const inviteUserEmail = this.inviteUserEmail;
+                        const inviteUserName = this.inviteUserName;
+                        fetch(inviteUserRequest).then(function(response){
+                            if(response.status === 200){
+                                alert("New user invited!");
+                                const newUser = createUserObject(newUserId, inviteUserName, inviteUserEmail);
+                                project.users.push(newUser);
+                            }else{
+                                alert("User invite failed!");
+                            }
+                        }).catch(function(error){
+                            console.log(error);
+                        });
+                    }else if(!validateEmail(this.inviteUserEmail)){
+                        alert('Email is invalid');
+                    }else{
+                        alert('Duplicate user found');
+                    }        
+                } else {
+                    alert('The user name cannot be null');
+                }
+            },
+    
+            createTask: function(project){
+    
+                // assume tasks are due at 11:59 pm on their due date
+    
+                current = new Date()
+                dueDate = new Date(this.newDueDate);
+                dueDate.setDate(dueDate.getDate()+1);
+    
+                if(current <= dueDate){
+                    if(this.newTaskText){
+                        if(this.newTaskUserEmail){
+                            let newId = 1;
+                            if(project.tasks.length > 0){
+                                newId = incrementMaxId(project.tasks);
+                            }   
+                            const foundUser = project.users.find(foundUserFunction(this.newTaskUserEmail));
+                            const createTaskRequest = new Request("/admin/create_task",{
+                                method: 'post',
+                                body: JSON.stringify({
+                                    projectName:project.name,
+                                    email:this.newTaskUserEmail,
+                                    text: this.newTaskText,
+                                    taskId:newId,
+                                    dueDate: dueDate,
+                                    priority: this.newTaskPriority
+                                }),
+                                headers: constantHeaders
+                            });
+                            const taskText = this.newTaskText;
+                            const taskPriority = this.newTaskPriority;
+                            const taskDueDate = this.newDueDate;
+                            const taskUserEmail = this.newTaskUserEmail;
+                            fetch(createTaskRequest).then(function(response){
+                                if(response.status === 200){
+                                    alert(`New Task Made With:(Name:${taskText},Due Date:${taskDueDate.toString()},Assignee:${taskUserEmail}),Priority:${taskPriority}`);
+                                    const task = createTaskObject(newId, taskText, false, false, taskPriority, dueDate, foundUser);
+                                    project.tasks.push(task); 
+                                }else if(response.status === 404){
+                                    alert("Your assignee hasn't registered!");
+                                }else{
+                                    alert("No Task Made");
+                                }
+                            }).catch(function(err){
+                                console.log(err);
+                            });
+                        }else{
+                            alert('A person must be assigned to a new task!');
+                        }
+                    }else{
+                        alert('Task name cannot be null');
+                    }
+                }else{
+                    alert('Assigned due date cannot have already passed');
+                }
+            },
+    
+            createProject:function(){
+                function makeFindProjectFunc(projectName){
+                    return (project) => {
+                        project.name === projectName;
+                    }
+                }
+                if (this.newProjectText && this.projects.find(makeFindProjectFunc(this.newProjectText) === undefined)){
+                    const createProjectRequest = new Request('/admin/add_project', {
+                        method: 'post',
+                        body:JSON.stringify({"name":this.newProjectText}), 
+                        headers: constantHeaders
+                    });
+                    let projectName = this.newProjectText;
+                    projects = this.projects;
+                    fetch(createProjectRequest).then(function(response){
+                        if(response.status === 200){
+                            alert(`New Project called: ${projectName} created`);
+                            const newProject = createProjectObject(projectName, 0, [], []);
+                            projects.push(newProject);
+                        }else{
+                            alert("Create Project Failed");
+                        }
+                    }).catch(function(error){
+                        console.log(error);
+                        alert("Create Project Failed");
+                    });
+                }else{
+                    alert('Project name cannot be null')
+                }
+            },
+    
+            searchAndSortTaskList: function(taskList){
+                const search_func = function(search_str){
+                    return function(task){
+                        return task.text.toLowerCase().includes(search_str.toLowerCase());
+                    }
+                }
+                
+                if(this.search === ""){
+                    return taskList.slice(0).sort(sort_task_func);
+                }else{
+                    return taskList.filter(search_func(this.search)).sort(sort_task_func);
+                }         
+            }
+        }
+    });
+}).catch((e) => {
+    console.log(e);
+    alert("An error occurred!");
+})

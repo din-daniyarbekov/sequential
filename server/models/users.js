@@ -47,13 +47,19 @@ const UserSchema = new mongoose.Schema({
 })
 
 UserSchema.methods.generateAuthToken = function () {
+	debugger;
 	let user = this;
+	if(user.tokens.length > 0){
+		debugger;
+		return user.tokens[0].token;
+	}
 	let access = 'auth';
 	let token = jwt.sign({_id: user._id.toHexString(), access}, 'abc123').toString();
   
 	user.tokens = user.tokens.concat([{access,token}]);
   
 	return user.save().then(() => {
+		debugger;
 	  return token;
 	});
   };
@@ -100,10 +106,11 @@ UserSchema.statics.findByEmailPassword = function(email, password) {
 
 		return new Promise((resolve, reject) => {
 			bcrypt.compare(password, user.password, (error, result) => {
+				debugger;
 				if (result) {
 					resolve(user);
 				} else {
-					reject();
+					reject(error);
 				}
 			})
 		})

@@ -13,7 +13,7 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav mr-auto">
                 <li class="nav-item">
-                    <a class="nav-link" href="index.html">Logout</a>
+                    <a class="nav-link" id="logout" >Logout</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="account_settings.html">User Settings</a>
@@ -31,6 +31,9 @@
             </div>
         </div>
         <input class="mt-1 form-control centered-auto-margin w-50" type="text" id="search" v-model="search" placeholder="Search your tasks here!"/> 
+        <div class="centered-text-align">
+            <button class="btn btn-primary mt-3" data-toggle="modal" data-target="#createTaskModal">Create a task</button>
+        </div>
         <div v-show="display == 0">
             <task v-for="task in searchedTasks" v-bind:key="task.id" v-bind:task="task"></task>
         </div>
@@ -39,9 +42,6 @@
         </div>
         <div v-show="display == 2">
             <task v-for="task in blockedTasks" v-bind:key="task.id" v-bind:task="task"></task>
-        </div>
-        <div class="centered-text-align">
-            <button class="btn btn-primary mt-3" data-toggle="modal" data-target="#createTaskModal">Create a task</button>
         </div>
         <div class="modal fade" id="createTaskModal" tabindex="-1" role="dialog" aria-labelledby="createTaskModal" aria-hidden="true">
                 <div class="modal-dialog" role="document">
