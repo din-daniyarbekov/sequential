@@ -581,8 +581,15 @@ app.patch('/user/update_task', authenticate, (req, res) => {
                     } catch(e){
                         return res.status(400).send(e)
                     }
+                    
                     user.save().then(user =>{
-                        return res.send(user);
+                        req.user.deleteToken(req.token).then(()=>{
+                            res.status(200).send();
+                        },()=>{
+                            res.status(400).send();
+                        });
+
+                        return res.status(200).send();
                     },(e) =>{
                         res.status(400).send(e);
                     })
@@ -610,6 +617,13 @@ app.patch('/user/update_task', authenticate, (req, res) => {
                             
 
                             user.save().then((userInfo) => {
+                                
+                                req.user.deleteToken(req.token).then(()=>{
+                                    res.status(200).send();
+                                },()=>{
+                                    res.status(400).send();
+                                });
+
                                 return res.send();
                             }, (e) =>{
                                 return res.status(500).send(e)

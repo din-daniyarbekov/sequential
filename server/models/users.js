@@ -64,6 +64,8 @@ UserSchema.methods.generateAuthToken = function () {
 	});
   };
 
+
+	
 UserSchema.methods.deleteToken = function (token) {
 	const user = this;
 	return user.update({
