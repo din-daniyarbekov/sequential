@@ -136,6 +136,8 @@ const taskComponent = Vue.component('task',{
                 </div>
                 <div class="col text-center">
                     <div> <span>{{task.assignee.name}}</span></div>
+                    <span v-show="task.done" class="badge badge-success">DONE</span>
+                    <span v-show="task.blocked" class="badge badge-danger">BLOCKED</span>
                     <span v-show="task.priority == 1" class="badge badge-warning">IMPORTANT</span>
                     <span v-show="task.priority == 2" class="badge badge-danger">URGENT</span>
                     <span v-show="relativeTime == 0" class="badge badge-danger">OVERDUE</span>

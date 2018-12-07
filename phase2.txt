@@ -26,7 +26,7 @@ Changes we have made since the previous phase include:
     - if a change is made to a tasks blocked or done indicators, an email is sent to the admin of that project
     - if a user creates a task for themselves the admin for that project is emailed
     - if an admin creates a task for a specific user, that user is emailed
-    - email also offers a link for user to register if they do not have an account on the website
+    - email also offers a link for user to register on invitation
 
 Differences from original project proposal include:
   removed the project_creation.html to limit the number of unnecessary views, replacing it with a modal pop up
