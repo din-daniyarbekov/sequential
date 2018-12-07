@@ -57,7 +57,8 @@ const ProjectSchema = new mongoose.Schema({
     tasks: {
         type:[{
             id: {
-                type: Number
+                type: Number,
+                required: true
             },
             text: {
                 type: String,
@@ -84,6 +85,10 @@ const ProjectSchema = new mongoose.Schema({
             assignee:{
                 type: mongoose.Schema.ObjectId,
                 required: true
+            },
+            assigneeEmail:{
+                type: String,
+                required: true
             }
         }],
         default:[]
@@ -102,8 +107,7 @@ const ProjectSchema = new mongoose.Schema({
                 type: String,
                 required: true,
 			    minlength: 1,
-			    trim: true,
-			    unique: true
+                trim: true            
             }
 
         }],
