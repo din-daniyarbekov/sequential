@@ -86,7 +86,8 @@ app.post('/users/login', (req, res) => {
         }).catch((error) => {
             debugger;
             res.status(400).send(error);
-        })
+        }) 
+        
     })
 
 
@@ -582,9 +583,13 @@ app.patch('/user/update_task', authenticate, (req, res) => {
                         return res.status(400).send(e)
                     }
                     user.save().then(user =>{
-                        return res.send(user);
+                        user.deleteToken(req.token).then(()=>{
+                            return res.status(200).send(user);
+                        },()=>{
+                            return res.status(400).send();
+                        });
                     },(e) =>{
-                        res.status(400).send(e);
+                        return res.status(400).send(e);
                     })
                 }
                 else{
@@ -610,7 +615,11 @@ app.patch('/user/update_task', authenticate, (req, res) => {
                             
 
                             user.save().then((userInfo) => {
-                                return res.send();
+                                req.user.deleteToken(req.token).then(()=>{
+                                    return res.status(200).send(userInfo);
+                                },()=>{
+                                    return res.status(400).send();
+                                });
                             }, (e) =>{
                                 return res.status(500).send(e)
                             })
