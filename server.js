@@ -631,8 +631,13 @@ app.patch('/user/update_task', authenticate, (req, res) => {
 
 
 
-
-app.listen(3000, ()=>{
-    console.log('started on port 3000')
-});
+if(process.env.PORT){
+    app.listen(process.env.PORT, ()=> {
+        console.log(`Started on ${process.env.PORT}`);
+    });
+}else{
+    app.listen(3000, ()=>{
+        console.log('started on port 3000');
+    });
+}
 
