@@ -1,0 +1,70 @@
+Demo Walkthrough
+
+Admin 
+user name: pabloescobar 
+password: 12345
+email: javednissar@gmail.com
+
+Basic User 1
+user name: tonymontana
+password:98765
+email: javed.nissar@mail.utoronto.ca
+
+Create Basic User 2
+user name: propjoe 
+password: wasdf
+email: javednissar@protonmail.com
+
+Admin:
+1. Log in to site
+2. Create new projects: "Dogs" and "Cats"
+3. Invite Basic User 1 to the project Cats
+4. Create new task "buy cat food" within Cat project and assign it to Basic User 1 with due date Dec 30
+5. Create Basic User 2
+6. Create a new task "Book vet appointment" within Cat project and assign it to Basic User 2 with due date Jan 10
+7. Implement basic user steps
+8. Delete the task that is marked with done
+9. Go to user settings and change password
+10. Log in to confirm password has been changed
+
+Basic User 1:
+1. Log in to site
+2. Wait until you recieve email notification that you have been invited to Cat project by an admin
+3. Create new task "Go to cat cafe" with due date this Sunday
+4. Mark "Go to cat cafe" as done
+5. Mark "Buy cat food" as a blocker 
+
+Questions:
+What features were limited to admin functionality and why were they?
+
+Why did you design the user and project data schemas this way?
+
+How do you authenticate user log-in information?
+
+How do you maintain account information and project states between multiple users?
+
+How did your choice of Vue.js influence your design decisions in the user interface?
+
+What were the deviations from the project proposal?
+
+Why did you use JSON web tokens?
+
+Why did you choose vue.js for the front end interface design?
+
+Why did we choose to use bootstrap?
+
+How were modals inplemented?
+
+Why did you choose mongodb?
+
+What challenges did you encounter when working on this project?
+
+What did you implement and improve in reponse to the phase 1 feedback?
+How did you increase the code complexity from the last phase? 
+	removed project_creation.html and turned it into a modal 
+	Added chronological and priority level sorting when viewing all tasks
+
+
+What would you have done differently on this project?
+	not use monogodb, relational database would work better for this project's data
+
