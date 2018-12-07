@@ -579,9 +579,13 @@ app.patch('/user/update_task', authenticate, (req, res) => {
                         user.password = req.body.password;
                         user.email = req.body.email;
                     } catch(e){
-                        res.status(400).send(e)
+                        return res.status(400).send(e)
                     }
-                    res.send(user);
+                    user.save().then(user =>{
+                        return res.send(user);
+                    },(e) =>{
+                        res.status(400).send(e);
+                    })
                 }
                 else{
                 Projects.findOne({
@@ -590,17 +594,15 @@ app.patch('/user/update_task', authenticate, (req, res) => {
                    
                     const password = req.body.password;
                     const email = req.body.email;
+
+                    // console.log(project);
                     try{
                         project.projectUsers.forEach(projUser => {
-                            if(projUser.email == email){
+                            if(projUser.email == user.email){
                                 projUser.email = email;
                             }
                           });
 
-                    } catch(e){
-                            res.status(400).send(e);
-                    }
-        
         
                         project.save().then((projInfo) => {
                             user.email = email;
@@ -608,23 +610,29 @@ app.patch('/user/update_task', authenticate, (req, res) => {
                             
 
                             user.save().then((userInfo) => {
-                                res.send(userInfo);
+                                return res.send();
                             }, (e) =>{
-                                res.status(500).send(e)
+                                return res.status(500).send(e)
                             })
 
-                            res.send(projInfo)
+                            return res.send(projInfo)
                             }, (e) =>{
-                                res.status(500).send(e);
+                                return res.status(500).send(e);
                             })
+
+                        } catch(e){
+                            return res.status(400).send(e);
+                    }
+
+                    console.log(project);
                         }, (e) => {
                             console.log(e);
-                            res.status(400).send(e);
+                            return res.status(400).send(e);
                         })
                     }
                 }).catch((e) =>{
                     console.log(e);
-                    res.status(400).send(e);
+                    return res.status(400).send(e);
                 });
             });
 
