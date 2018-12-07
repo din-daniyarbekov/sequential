@@ -45,15 +45,15 @@ let data = {
 // serve the static files
 app.use(express.static('static'))
 
-app.use(session({
-	secret: 'oursecret',
-	resave: false,
-	saveUninitialized: false,
-	cookie: {
-		expires: 600000,
-		httpOnly: true
-	}
-}))
+// app.use(session({
+// 	secret: 'oursecret',
+// 	resave: false,
+// 	saveUninitialized: false,
+// 	cookie: {
+// 		expires: 600000,
+// 		httpOnly: true
+// 	}
+// }))
 
 
 app.get('/',(req,res)=>{
