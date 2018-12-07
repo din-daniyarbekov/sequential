@@ -55,3 +55,19 @@ Basic User:
 2. Wait until you recieve notification that you have been invited to a project by an admin
 3. Create new tasks that will be assigned to you 
 4. Manage your tasks assigned to you with done and blocker markers 
+
+Routes Overview:
+
+'/' & '/login' - directs to index.html
+'/registration' - registers data from account-creation.html as new account
+'/users/login' - logs users into the site
+'/users/logout' - logs users out of the site
+'/admin/invite_user' - add user to project if they exist and send notifcation to user's email address
+'/admin/add_project' - add a new project to the site's database
+'/admin/get_projects' - retrieve a specific project
+'/admin/create_task' - create a task where the assignee can be anyone
+'/admin/delete_task' - delete a task from the database
+'/user/create_task' - create a task assigned to the originator of the create task command
+'/user/get_tasks' - get a list of tasks assigned to a single user'
+'/user/update_task' - updates the status of a task, and send an email to the admin creator of the project
+'/change_account_details' - modify an accounts password and email address
