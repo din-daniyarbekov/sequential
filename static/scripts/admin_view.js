@@ -256,7 +256,7 @@ fetch(request).then(function(res){
                 return text.split(' ').join('');
             },
             inviteUser:function(project){
-                const foundUser = project.users.find(foundUserFunction(this.inviteUserEmail));
+                const foundUser = project.users.find(foundUserFunction(this.inviteUserEmail, this.inviteUserName));
                 if(this.inviteUserName){
                     if(validateEmail(this.inviteUserEmail) && foundUser === undefined){
                         let newUserId = 1;
