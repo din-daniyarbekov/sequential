@@ -357,7 +357,7 @@ fetch(request).then(function(res){
                         project.name === projectName;
                     }
                 }
-                if (this.newProjectText && this.projects.find(makeFindProjectFunc(this.newProjectText) === undefined)){
+                if (this.newProjectText && this.projects.find(makeFindProjectFunc(this.newProjectText)) === undefined){
                     const createProjectRequest = new Request('/admin/add_project', {
                         method: 'post',
                         body:JSON.stringify({"name":this.newProjectText}), 
