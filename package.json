@@ -1,9 +1,10 @@
 {
-  "name": "team42",
+  "name": "sequential-docker",
   "version": "1.0.0",
   "description": "1. Index.html - \"Sign-in\"<br/>      You can sign-in by using both User and Admin profile. <br/>      In order to sign-in as a User, use \"user@mail.com\" for the email and \"12345\" for the password.<br/>      In order to sign-in as an Admin, use \"admin@mail.com\" for the email and \"6789\" for the password.<br/>",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
+    "start": "node server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

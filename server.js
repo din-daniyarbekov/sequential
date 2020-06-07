@@ -18,7 +18,7 @@ app.use(bodyParser.urlencoded({ extended:true }))
 
 
 const api_key = 'key-d49e7e3904329d259b251f94688a45e5';
-const domain = 'mg.javednissar.me';
+const domain = '-----';
 const mailgun = require('mailgun-js')({apiKey: api_key, domain: domain});
  
 let data = {
@@ -29,36 +29,11 @@ let data = {
 };
  
 
-
-
-/*auth -> we send the token from the server to the client (id),
-    data = {
-        id: 3
-    }
-    helps us understand which user made the request. for the security reasons we will use the token system
-    token  = {
-        data,
-        hash -> hashed value of the data
-    }
-*/
-
-// serve the static files
 app.use(express.static('static'))
-
-// app.use(session({
-// 	secret: 'oursecret',
-// 	resave: false,
-// 	saveUninitialized: false,
-// 	cookie: {
-// 		expires: 600000,
-// 		httpOnly: true
-// 	}
-// }))
-
-
 app.get('/',(req,res)=>{
     res.redirect('./login');
 })
+
 
 app.route('/registration')
   .get((req, res) => {
@@ -81,10 +56,8 @@ app.post('/users/login', (req, res) => {
             userToUse = user;
             return user.generateAuthToken();
         }).then((token) => {
-            debugger;
             res.send({token:token, isAdmin: userToUse.isAdmin});
         }).catch((error) => {
-            debugger;
             res.status(400).send(error);
         }) 
         
@@ -103,7 +76,7 @@ let authenticate = (req, res, next) => {
           req.token = token;
           next();
         }).catch((e) => {
-          res.status(401).send();
+          res.status(401).end();
         });
       };
 
@@ -172,9 +145,9 @@ app.post('/admin/invite_user',authenticate,(req,res)=>{
         data.subject = `Sequential: You're invited to ${req.body.projectName}`;
         const inviteURL = makeInviteURL();
         data.text = `Please go to ${inviteURL}`;
-        mailgun.messages().send(data, function (error, body) {
-            console.log(body);
-        });  
+        // mailgun.messages().send(data, function (error, body) {
+        //     console.log(body);
+        // });  
 
         res.send(docs);
     },(e) =>{
@@ -234,6 +207,7 @@ app.post('/admin/create_task',authenticate, (req, res) =>{
         User.findOne({
             email: req.body.email
         }).then((user) => {
+            console.log(user);
             if(user === undefined){
                 res.status(404).send("Could not find user");
                 return;
@@ -252,12 +226,11 @@ app.post('/admin/create_task',authenticate, (req, res) =>{
                     data.to = task.assigneeEmail;
                     data.subject = 'Sequential: Task Assigned'
                     data.text = `You have a new task, ${req.body.text}`;
-                    debugger;
-                    mailgun.messages().send(data, function (error, body) {
-                        console.log("Task Email Sent");
-                    }, (e)=>{
-                        console.log(e);
-                    });
+                    // mailgun.messages().send(data, function (error, body) {
+                    //     console.log("Task Email Sent");
+                    // }, (e)=>{
+                    //     console.log(e);
+                    // });
                     res.send(docs);
                 }, (e) => {
                     console.log(e);
@@ -284,7 +257,6 @@ app.post('/user/create_task',authenticate, (req, res) =>{
         'projectUsers.email': user.email
     }).then((project) => {
         try{
-
             task = {
                 id: parseInt(req.body.taskId),
                 text: req.body.text,
@@ -305,14 +277,12 @@ app.post('/user/create_task',authenticate, (req, res) =>{
 
                     data.subject = 'Sequential: Task Created';
                     data.text = `The following task is created: ${task.text}`;
-
-                    mailgun.messages().send(data, function (error, body) {
-                        if(error){
-                            res.status(500).send(error);
-                        }else{
-                            console.log(body);
-                        }
-                      });
+                    // mailgun.messages().send(data, function (error, body) {
+                    //     if(error){
+                    //         res.status(500).send(error);
+                    //     }else{
+                    //         console.log(body);
+                    //     }});
                     res.send(docs); 
                 })
             }, (e) => {
@@ -337,6 +307,7 @@ app.post('/user/create_task',authenticate, (req, res) =>{
 
 
 app.get('/user/get_tasks', authenticate, (req, res) => {
+    console.log(req.user);
     Projects.findOne({
         'tasks.assignee': req.user.id
     }).then((doc) => {
@@ -358,22 +329,15 @@ app.patch('/user/update_task', authenticate, (req, res) => {
         Projects.findOne({
             'projectUsers.email': user.email
         }).then((project) => {
-
                 const done = req.body.done;
                 const blocker = req.body.blocker;
                 try{
-
                     const taskIndex = project.tasks.findIndex(task =>{
                         return task.id === req.body.taskId;
                     });
                     project.tasks[taskIndex].blocker = blocker;
                     project.tasks[taskIndex].done = done;
-                    debugger;
                     const task = project.tasks[taskIndex];
-
-
-
-
 
                 project.save().then((docs) => {
                     User.findById(project.admin).then((admin) => {
@@ -388,13 +352,13 @@ app.patch('/user/update_task', authenticate, (req, res) => {
                             data.subject = 'Sequential: Task is no longer Done or Blocked';
                             data.text = `The following task is no longer done or blocked: ${task.text}`;
                         }
-                        mailgun.messages().send(data, function (error, body) {
-                            if(error){
-                                res.status(500).send(error);
-                            }else{
-                                console.log(body);
-                            }
-                          });
+                        // mailgun.messages().send(data, function (error, body) {
+                        //     if(error){
+                        //         res.status(500).send(error);
+                        //     }else{
+                        //         console.log(body);
+                        //     }
+                        //   });
                         res.send(docs); 
                     });
                 } , (e) => {
@@ -438,11 +402,11 @@ app.patch('/user/update_task', authenticate, (req, res) => {
                     data.to = deletedTask.assigneeEmail;
                     data.subject = 'Sequential: Task Deleted'
                     data.text = `Deleted the task: ${deletedTask.text} in ${project.name}`;
-                    mailgun.messages().send(data, function (error, body) {
-                    console.log(body);
-                    },(e)=>{
-                        console.log(e);
-                    });  
+                    // mailgun.messages().send(data, function (error, body) {
+                    // console.log(body);
+                    // },(e)=>{
+                    //     console.log(e);
+                    // });  
 
                         res.status(200).send(docs); 
                     }, (e) => {
@@ -534,10 +498,8 @@ app.patch('/user/update_task', authenticate, (req, res) => {
 
                         } catch(e){
                             return res.status(400).send(e);
-                    }
-
-                    console.log(project);
-                        }, (e) => {
+                        }
+                    }, (e) => {
                             console.log(e);
                             return res.status(400).send(e);
                         })
