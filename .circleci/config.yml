@@ -17,7 +17,7 @@ jobs:
       - image: circleci/node:7.10
     steps:
       - checkout
-      - run: ssh -oStrictHostKeyChecking=no -v $DROPLET@$DROPLET_IP “/home/circleci/deploy_project.sh”
+      - run: ssh -oStrictHostKeyChecking=no -v $DROPLET@$DROPLET_IP
 workflows:
   version: 2
   build-and-deploy:
