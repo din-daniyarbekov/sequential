@@ -19,13 +19,10 @@ jobs:
       - checkout
       - run: ssh -oStrictHostKeyChecking=no -v $DROPLET_USER@$DROPLET_IP “./deploy_project.sh”
 workflows:
-    build-and-deploy:
-      jobs:
-        - build-and-test
-        - deploy-prod:
-          filters:
-            branches:
-              only:
-                - master
-          requires:
-            - build-and-test
+  version: 2
+  build-and-deploy:
+    jobs:
+      - build-and-test
+      - deploy-prod:
+        requires:
+          - build-and-test
