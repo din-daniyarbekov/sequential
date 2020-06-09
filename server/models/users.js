@@ -1,4 +1,3 @@
-
 /* Users model */
 const mongoose = require('mongoose')
 const validator = require('validator')
@@ -23,33 +22,31 @@ const UserSchema = new mongoose.Schema({
 				message: 'Not valid email'
 			}
 		},
-		password: {
+	password: {
+		type: String,
+		required: true,
+		minlength: 5
+	},
+	isAdmin:{
+		type:Boolean,
+		required:true,
+		default: false
+	},
+	tokens:[{
+		access: {
 			type: String,
-			required: true,
-			minlength: 5
+			required: true	
 		},
-		isAdmin:{
-			type:Boolean,
-			required:true,
-			default: false
-		},
-		tokens:[{
-			access: {
-				type: String,
-				required: true	
-			},
-			token: {
-				type: String,
-				required: true
-			}
-		}]
+		token: {
+			type: String,
+			required: true
+		}
+	}]
 })
 
 UserSchema.methods.generateAuthToken = function () {
-	debugger;
 	let user = this;
 	if(user.tokens.length > 0){
-		debugger;
 		return user.tokens[0].token;
 	}
 	let access = 'auth';
@@ -58,7 +55,6 @@ UserSchema.methods.generateAuthToken = function () {
 	user.tokens = user.tokens.concat([{access,token}]);
   
 	return user.save().then(() => {
-		debugger;
 	  return token;
 	});
   };
@@ -102,12 +98,11 @@ UserSchema.statics.findByEmailPassword = function(email, password) {
 
 	return User.findOne({email: email}).then((user) => {
 		if (!user) {
-			return Promise.reject()
+			return Promise.reject();
 		}
 
 		return new Promise((resolve, reject) => {
 			bcrypt.compare(password, user.password, (error, result) => {
-				debugger;
 				if (result) {
 					resolve(user);
 				} else {
